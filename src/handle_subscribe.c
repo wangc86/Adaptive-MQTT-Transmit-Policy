@@ -99,7 +99,7 @@ int handle__subscribe(struct mosquitto *context)
 			mosquitto__free(payload);
 			return MOSQ_ERR_MALFORMED_PACKET;
 		}
-
+		//sub is the subscribe topic
 		if(sub){
 			if(!slen){
 				log__printf(NULL, MOSQ_LOG_INFO,

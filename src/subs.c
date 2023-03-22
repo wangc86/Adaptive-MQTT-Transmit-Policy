@@ -482,7 +482,7 @@ static int sub__search(struct mosquitto__subhier *subhier, char **split_topics, 
 	struct mosquitto__subhier *branch;
 	int rc;
 	bool have_subscribers = false;
-
+	//20230321在這裡比對topic嗎？不確定，但應該是
 	if(split_topics && split_topics[0]){
 		/* Check for literal match */
 		HASH_FIND(hh, subhier->children, split_topics[0], strlen(split_topics[0]), branch);
@@ -496,6 +496,7 @@ static int sub__search(struct mosquitto__subhier *subhier, char **split_topics, 
 			}
 			if(split_topics[1] == NULL){ /* End of list */
 				rc = subs__process(branch, source_id, topic, qos, retain, stored);
+				printf("\n/stored->dest_ids[0]: %s\n",*stored->dest_ids);	//20230320這裡已經找的到dest_id惹
 				if(rc == MOSQ_ERR_SUCCESS){
 					have_subscribers = true;
 				}else if(rc != MOSQ_ERR_NO_SUBSCRIBERS){
@@ -598,6 +599,7 @@ int sub__add(struct mosquitto *context, const char *sub, uint8_t qos, uint32_t i
 		return MOSQ_ERR_INVAL;
 	}
 	HASH_FIND(hh, *root, topics[0], topiclen, subhier);
+	
 	if(!subhier){
 		subhier = sub__add_hier_entry(NULL, root, topics[0], (uint16_t)topiclen);
 		if(!subhier){
@@ -609,7 +611,6 @@ int sub__add(struct mosquitto *context, const char *sub, uint8_t qos, uint32_t i
 
 	}
 	rc = sub__add_context(context, sub, qos, identifier, options, subhier, topics, sharename);
-
 	mosquitto__free(local_sub);
 	mosquitto__free(topics);
 
@@ -658,8 +659,13 @@ int sub__messages_queue(const char *source_id, const char *topic, uint8_t qos, i
 	db__message_write(), which could remove the message if ref_count==0.
 	*/
 	db__msg_store_ref_inc(*stored);
-
+	//HASH_FIND: 在db.subs中找有沒有split_topics[0]並把結果放在subhier
 	HASH_FIND(hh, db.subs, split_topics[0], strlen(split_topics[0]), subhier);
+	// struct mosquitto__subhier *s;
+	// for (s = db.subs; s != NULL; s = s->hh.next) {
+    //     printf("**Topic %s\n", s->topic);
+    // }
+	// printf("--topic: %s\n", split_topics[0]);
 	if(subhier){
 		rc = sub__search(subhier, split_topics, source_id, topic, qos, retain, *stored);
 	}

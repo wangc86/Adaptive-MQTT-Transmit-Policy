@@ -59,6 +59,7 @@ int send__pingreq(struct mosquitto *mosq)
 
 int send__pingresp(struct mosquitto *mosq)
 {
+	printf("**send__pingresp**\n");
 #ifdef WITH_BROKER
 	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PINGRESP to %s", mosq->id);
 #else

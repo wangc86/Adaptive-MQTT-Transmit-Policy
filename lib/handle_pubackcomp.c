@@ -121,15 +121,15 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 #ifdef WITH_BROKER
 
 	//1108 timestamps of broker (receive the PUBACK)
-	struct timespec tp;
-	if(clock_gettime(CLOCK_MONOTONIC, &tp))
-	{
-		perror("client/pub_client.c: my_publsih");
-		exit(EXIT_FAILURE);
-	}
-	fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+	// struct timespec tp;
+	// if(clock_gettime(CLOCK_MONOTONIC, &tp))
+	// {
+	// 	perror("client/pub_client.c: my_publsih");
+	// 	exit(EXIT_FAILURE);
+	// }
+	// fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
 
-	log__printf(NULL, MOSQ_LOG_DEBUG, "Received %s from %s (Mid: %d, RC:%d)", type, mosq->id, mid, reason_code);
+	// log__printf(NULL, MOSQ_LOG_DEBUG, "Received %s from %s (Mid: %d, RC:%d)", type, mosq->id, mid, reason_code);
 
 	/* Immediately free, we don't do anything with Reason String or User Property at the moment */
 	mosquitto_property_free_all(&properties);

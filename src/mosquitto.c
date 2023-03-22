@@ -645,3 +645,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return rc;
 }
 #endif
+
+//20230321 broker timer進行中，還沒完成
+// void brokertimer() // e4: timer
+// {
+
+// }

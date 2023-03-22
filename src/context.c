@@ -46,6 +46,7 @@ struct mosquitto *context__init(mosq_sock_t sock)
 	context->pollfd_index = -1;
 #endif
 	mosquitto__set_state(context, mosq_cs_new);
+	mosquitto__set_mode(context, slow_mode);	//20230321 Changes 當context初始化時也要初始化mode(init為normal mode)
 	context->sock = sock;
 	context->last_msg_in = db.now_s;
 	context->next_msg_out = db.now_s + 60;
@@ -188,7 +189,6 @@ void context__send_will(struct mosquitto *ctxt)
 					(uint8_t)ctxt->will->msg.qos,
 					ctxt->will->msg.retain,
 					MOSQ_ACL_WRITE) == MOSQ_ERR_SUCCESS){
-
 			/* Unexpected disconnect, queue the client will. */
 			db__messages_easy_queue(ctxt,
 					ctxt->will->msg.topic,

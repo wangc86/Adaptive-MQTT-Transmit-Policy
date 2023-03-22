@@ -32,6 +32,8 @@ uint16_t mosquitto__mid_generate(struct mosquitto *mosq);
 
 int mosquitto__set_state(struct mosquitto *mosq, enum mosquitto_client_state state);
 enum mosquitto_client_state mosquitto__get_state(struct mosquitto *mosq);
+int mosquitto__set_mode(struct mosquitto *mosq, enum transfer_mode mode);
+enum transfer_mode mosquitto__get_mode(struct mosquitto *mosq);
 
 #ifdef WITH_TLS
 int mosquitto__hex2bin_sha1(const char *hex, unsigned char **bin);

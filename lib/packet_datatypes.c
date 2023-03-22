@@ -161,7 +161,7 @@ int packet__read_uint16(struct mosquitto__packet *packet, uint16_t *word)
 	packet->pos++;
 
 	*word = (uint16_t)((msb<<8) + lsb);
-
+	// printf("word: %s\n", word);
 	return MOSQ_ERR_SUCCESS;
 }
 

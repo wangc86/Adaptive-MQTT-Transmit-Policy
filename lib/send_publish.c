@@ -65,6 +65,7 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 		retain = false;
 	}
 
+//Broker傳送PUBLISH給Client
 #ifdef WITH_BROKER
 	if(mosq->listener && mosq->listener->mount_point){
 		len = strlen(mosq->listener->mount_point);
@@ -117,16 +118,17 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 					}
 
 					//1108 timestamps of broker (send the message out)
-					struct timespec tp;
-					if(clock_gettime(CLOCK_MONOTONIC, &tp))
-					{
-						perror("client/pub_client.c: my_publsih");
-						exit(EXIT_FAILURE);
-					}
-					fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+					// struct timespec tp;
+					// if(clock_gettime(CLOCK_MONOTONIC, &tp))
+					// {
+					// 	perror("client/pub_client.c: my_publsih");
+					// 	exit(EXIT_FAILURE);
+					// }
+					// fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
 
 					log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, mapped_topic, (long)payloadlen);
 					G_PUB_BYTES_SENT_INC(payloadlen);
+					//Broker傳送PUBLISH給Client
 					rc =  send__real_publish(mosq, mid, mapped_topic, payloadlen, payload, qos, retain, dup, cmsg_props, store_props, expiry_interval);
 					mosquitto__free(mapped_topic);
 					return rc;
@@ -136,43 +138,45 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 	}
 #endif
 
-	//1108 timestamps of broker (send the PUBLISH)
-	struct timespec tp;
-	if(clock_gettime(CLOCK_MONOTONIC, &tp))
-	{
-		perror("client/pub_client.c: my_publsih");
-		exit(EXIT_FAILURE);
-	}
+	// //1108 timestamps of broker (send the PUBLISH)
+	// struct timespec tp;
+	// if(clock_gettime(CLOCK_MONOTONIC, &tp))
+	// {
+	// 	perror("client/pub_client.c: my_publsih");
+	// 	exit(EXIT_FAILURE);
+	// }
 	// fprintf(stderr, "Bro2: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
 	
-	//1108
-	long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
-	long tmp2=floor(tmp/10000000000);
-	tmp2=tmp-(tmp2*10000000000);
-	char tmp_payload[11];
-	char cpy_payload[payloadlen];
+	// //1108
+	// long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
+	// long tmp2=floor(tmp/10000000000);
+	// tmp2=tmp-(tmp2*10000000000);
+	// char tmp_payload[11];
+	// char cpy_payload[payloadlen];
 
-	sprintf(tmp_payload, "%ld", tmp2 );
-	if(strlen(tmp_payload)!=10){
-		int i=0;
-		for(i=0; i<(10-strlen(tmp_payload)); i++){
-			tmp_payload[i]='0';
-		}
-		sprintf(tmp_payload+i, "%ld", tmp2 );
-	}
+	// sprintf(tmp_payload, "%ld", tmp2 );
+	// if(strlen(tmp_payload)!=10){
+	// 	int i=0;
+	// 	for(i=0; i<(10-strlen(tmp_payload)); i++){
+	// 		tmp_payload[i]='0';
+	// 	}
+	// 	sprintf(tmp_payload+i, "%ld", tmp2 );
+	// }
 		
-	strncpy(cpy_payload,payload,payloadlen-11);
-	cpy_payload[payloadlen-11]='\0';
-	strcat(cpy_payload,tmp_payload);
-	strcpy(payload,cpy_payload);
+	// strncpy(cpy_payload,payload,payloadlen-11);
+	// cpy_payload[payloadlen-11]='\0';
+	// strcat(cpy_payload,tmp_payload);
+	// strcpy(payload,cpy_payload);
 	// fprintf(stderr, "bro2_payload: %s\n", payload);
-
-	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
+	//Broker傳送PUBLISH給Client
+	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, mosq->address, dup, qos, retain, mid, mapped_topic, (long)payloadlen);		//2023加上address
+	// log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
 	G_PUB_BYTES_SENT_INC(payloadlen);
 #else
+	//Client傳送PUBLISH給Broker
 	log__printf(mosq, MOSQ_LOG_DEBUG, "Client %s sending PUBLISH (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
 #endif
-
+	//Client傳送PUBLISH給Broker
 	return send__real_publish(mosq, mid, topic, payloadlen, payload, qos, retain, dup, cmsg_props, store_props, expiry_interval);
 }
 

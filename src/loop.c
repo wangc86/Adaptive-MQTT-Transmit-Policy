@@ -72,6 +72,7 @@ static struct lws_sorted_usec_list sul;
 
 static int single_publish(struct mosquitto *context, struct mosquitto_message_v5 *msg, uint32_t message_expiry)
 {
+	printf("...single_publish...\n");
 	struct mosquitto_msg_store *stored;
 	uint16_t mid;
 
@@ -143,7 +144,6 @@ static void queue_plugin_msgs(void)
 		DL_DELETE(db.plugin_msgs, msg);
 
 		read_message_expiry_interval(&msg->properties, &message_expiry);
-
 		if(msg->clientid){
 			HASH_FIND(hh_id, db.contexts_by_id, msg->clientid, strlen(msg->clientid), context);
 			if(context){

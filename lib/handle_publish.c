@@ -140,7 +140,7 @@ int handle__publish(struct mosquitto *mosq)
 			return MOSQ_ERR_SUCCESS;
 		case 1:
 			util__decrement_receive_quota(mosq);
-			rc = send__puback(mosq, mid, 0, NULL);
+			rc = send__puback(mosq, mid, 0, NULL);	//20230308 暫時拿掉send__puback
 			pthread_mutex_lock(&mosq->callback_mutex);
 			if(mosq->on_message){
 				mosq->in_callback = true;

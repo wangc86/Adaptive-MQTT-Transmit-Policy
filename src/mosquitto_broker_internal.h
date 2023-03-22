@@ -304,6 +304,8 @@ struct mosquitto__config {
 	int bridge_count;
 #endif
 	struct mosquitto__security_options security_options;
+	//20230209
+	size_t threshold_s;	//20230209Changes threshold for packet size,0321型態從int改為size_t
 };
 
 
@@ -668,6 +670,9 @@ int db__message_write_inflight_out_all(struct mosquitto *context);
 int db__message_write_inflight_out_latest(struct mosquitto *context);
 int db__message_write_queued_out(struct mosquitto *context);
 int db__message_write_queued_in(struct mosquitto *context);
+//20230116 自己新增的部分( write by Maggie)
+void db__message_destored_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data);
+int db__message_write_stored_out(struct mosquitto *context);
 
 /* ============================================================
  * Subscription functions

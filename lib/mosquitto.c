@@ -207,6 +207,7 @@ int mosquitto_reinitialise(struct mosquitto *mosq, const char *id, bool clean_st
 	pthread_mutex_init(&mosq->callback_mutex, NULL);
 	pthread_mutex_init(&mosq->log_callback_mutex, NULL);
 	pthread_mutex_init(&mosq->state_mutex, NULL);
+	pthread_mutex_init(&mosq->mode_mutex, NULL);		//20230321 Changes for transfer_mode's mutex init
 	pthread_mutex_init(&mosq->out_packet_mutex, NULL);
 	pthread_mutex_init(&mosq->current_out_packet_mutex, NULL);
 	pthread_mutex_init(&mosq->msgtime_mutex, NULL);
@@ -246,6 +247,7 @@ void mosquitto__destroy(struct mosquitto *mosq)
 		pthread_mutex_destroy(&mosq->callback_mutex);
 		pthread_mutex_destroy(&mosq->log_callback_mutex);
 		pthread_mutex_destroy(&mosq->state_mutex);
+		pthread_mutex_destroy(&mosq->mode_mutex);		//20230321 Changes for transfer_mode's mutex destroy
 		pthread_mutex_destroy(&mosq->out_packet_mutex);
 		pthread_mutex_destroy(&mosq->current_out_packet_mutex);
 		pthread_mutex_destroy(&mosq->msgtime_mutex);

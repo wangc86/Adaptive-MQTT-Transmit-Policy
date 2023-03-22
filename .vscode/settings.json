@@ -2,6 +2,8 @@
     "files.associations": {
         "compare": "c",
         "type_traits": "c",
-        "cstring": "c"
+        "cstring": "c",
+        "utlist.h": "c",
+        "export": "c"
     }
 }

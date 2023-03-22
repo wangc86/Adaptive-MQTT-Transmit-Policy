@@ -40,6 +40,7 @@ int handle__publish(struct mosquitto *context)
 	int rc = 0;
 	int rc2;
 	uint8_t header = context->in_packet.command;
+
 	int res = 0;
 	struct mosquitto_msg_store *msg, *stored = NULL;
 	size_t len;
@@ -64,6 +65,8 @@ int handle__publish(struct mosquitto *context)
 
 	dup = (header & 0x08)>>3;
 	msg->qos = (header & 0x06)>>1;
+
+	//標頭處理，處理邏輯上的錯誤
 	if(dup == 1 && msg->qos == 0){
 		log__printf(NULL, MOSQ_LOG_INFO,
 				"Invalid PUBLISH (QoS=0 and DUP=1) from %s, disconnecting.", context->id);
@@ -100,10 +103,13 @@ int handle__publish(struct mosquitto *context)
 	}
 
 	if(msg->qos > 0){
+		// printf("mid_first: %d, and ", mid);
+		//分配mid，所以QoS0的mid永遠是0
 		if(packet__read_uint16(&context->in_packet, &mid)){
 			db__msg_store_free(msg);
 			return MOSQ_ERR_MALFORMED_PACKET;
 		}
+		printf("\n--mid--: %d\n", mid);
 		if(mid == 0){
 			db__msg_store_free(msg);
 			return MOSQ_ERR_PROTOCOL;
@@ -257,42 +263,42 @@ int handle__publish(struct mosquitto *context)
 		return rc;
 	}
 
-	printf("--header---: %p\n", context->in_packet.command);
-	printf("--payload--: %s\n", msg->payload);
+	printf("--header---: %d\n", context->in_packet.command);
+	printf("--payload--: %p\n\n", msg->payload);
 
-	//1108 timestamps of broker (receive the PUBLISH) //{}aviod the error of goto process_bad_message
-	{
-		// 1108
-		struct timespec tp;
-		if(clock_gettime(CLOCK_MONOTONIC, &tp))
-		{
-			perror("src/handle_publish.c: handle__publish");
-			exit(EXIT_FAILURE);
-		}
-		// fprintf(stderr, "Bro1: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
-		long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
-		long tmp2=floor(tmp/10000000000);
-		tmp2=tmp-(tmp2*10000000000);
-		char tmp_payload[11];
-		char cpy_payload[msg->payloadlen];
+	// //1108 timestamps of broker (receive the PUBLISH) //{}aviod the error of goto process_bad_message
+	// {
+	// 	// 1108
+	// 	struct timespec tp;
+	// 	if(clock_gettime(CLOCK_MONOTONIC, &tp))
+	// 	{
+	// 		perror("src/handle_publish.c: handle__publish");
+	// 		exit(EXIT_FAILURE);
+	// 	}
+	// 	// fprintf(stderr, "Bro1: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+	// 	long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
+	// 	long tmp2=floor(tmp/10000000000);
+	// 	tmp2=tmp-(tmp2*10000000000);
+	// 	char tmp_payload[11];
+	// 	char cpy_payload[msg->payloadlen];
 
-		sprintf(tmp_payload, "%ld", tmp2 );
-		if(strlen(tmp_payload)!=10){
-			int i=0;
-			for(i=0; i<(10-strlen(tmp_payload)); i++){
-				tmp_payload[i]='0';
-			}
-			sprintf(tmp_payload+i, "%ld", tmp2 );
-		}
+	// 	sprintf(tmp_payload, "%ld", tmp2 );
+	// 	if(strlen(tmp_payload)!=10){
+	// 		int i=0;
+	// 		for(i=0; i<(10-strlen(tmp_payload)); i++){
+	// 			tmp_payload[i]='0';
+	// 		}
+	// 		sprintf(tmp_payload+i, "%ld", tmp2 );
+	// 	}
 		
-		strncpy(cpy_payload,msg->payload,msg->payloadlen-11);
-		cpy_payload[msg->payloadlen-21]='\0';
-		strcat(cpy_payload,tmp_payload);
-		strcat(cpy_payload,"0000000000");
-		strcpy(msg->payload,cpy_payload);
-		// fprintf(stderr, "bro1_payload: %s\n", msg->payload);
-	}
-	log__printf(NULL, MOSQ_LOG_DEBUG, "Received PUBLISH from %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes)), Time: %ld", context->id, dup, msg->qos, msg->retain, msg->source_mid, msg->topic, (long)msg->payloadlen);
+	// 	strncpy(cpy_payload,msg->payload,msg->payloadlen-11);
+	// 	cpy_payload[msg->payloadlen-21]='\0';
+	// 	strcat(cpy_payload,tmp_payload);
+	// 	strcat(cpy_payload,"0000000000");
+	// 	strcpy(msg->payload,cpy_payload);
+	// 	// fprintf(stderr, "bro1_payload: %s\n", msg->payload);
+	// }
+	log__printf(NULL, MOSQ_LOG_DEBUG, "Received PUBLISH from %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", context->id, dup, msg->qos, msg->retain, msg->source_mid, msg->topic, (long)msg->payloadlen);
 
 	if(!strncmp(msg->topic, "$CONTROL/", 9)){
 #ifdef WITH_CONTROL
@@ -337,6 +343,7 @@ int handle__publish(struct mosquitto *context)
 	}
 
 	if(!stored){
+		//目前觀察，不管QoS0還是1都會進到這裡
 		if(msg->qos == 0
 				|| db__ready_for_flight(context, mosq_md_in, msg->qos)
 				|| db__ready_for_queue(context, msg->qos, &context->msgs_in)){

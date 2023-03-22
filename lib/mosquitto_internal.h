@@ -4,12 +4,12 @@ Copyright (c) 2010-2020 Roger Light <roger@atchoo.org>
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License 2.0
 and Eclipse Distribution License v1.0 which accompany this distribution.
- 
+
 The Eclipse Public License is available at
    https://www.eclipse.org/legal/epl-2.0/
 and the Eclipse Distribution License is available at
   http://www.eclipse.org/org/documents/edl-v10.php.
- 
+
 SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 
 Contributors:
@@ -23,46 +23,46 @@ Contributors:
 #include "config.h"
 
 #ifdef WIN32
-#  include <winsock2.h>
+#include <winsock2.h>
 #endif
 
 #ifdef WITH_TLS
-#  include <openssl/ssl.h>
+#include <openssl/ssl.h>
 #else
-#  include <time.h>
+#include <time.h>
 #endif
 #include <stdlib.h>
 
 #if defined(WITH_THREADING) && !defined(WITH_BROKER)
-#  include <pthread.h>
+#include <pthread.h>
 #else
-#  include <dummypthread.h>
+#include <dummypthread.h>
 #endif
 
 #ifdef WITH_SRV
-#  include <ares.h>
+#include <ares.h>
 #endif
 
 #ifdef WIN32
-#	if _MSC_VER < 1600
-		typedef unsigned char uint8_t;
-		typedef unsigned short uint16_t;
-		typedef unsigned int uint32_t;
-		typedef unsigned long long uint64_t;
-#	else
-#		include <stdint.h>
-#	endif
+#if _MSC_VER < 1600
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
 #else
-#	include <stdint.h>
+#include <stdint.h>
+#endif
+#else
+#include <stdint.h>
 #endif
 
 #include "mosquitto.h"
 #include "time_mosq.h"
 #ifdef WITH_BROKER
-#  ifdef __linux__
-#    include <netdb.h>
-#  endif
-#  include "uthash.h"
+#ifdef __linux__
+#include <netdb.h>
+#endif
+#include "uthash.h"
 struct mosquitto_client_msg;
 #endif
 
@@ -72,12 +72,21 @@ typedef SOCKET mosq_sock_t;
 typedef int mosq_sock_t;
 #endif
 
-enum mosquitto_msg_direction {
+enum mosquitto_msg_direction
+{
 	mosq_md_in = 0,
 	mosq_md_out = 1
 };
 
-enum mosquitto_msg_state {
+// 20230320 Changes加上不同的mode
+enum transfer_mode
+{
+	normal_mode = 0,
+	slow_mode = 1
+};
+
+enum mosquitto_msg_state
+{
 	mosq_ms_invalid = 0,
 	mosq_ms_publish_qos0 = 1,
 	mosq_ms_publish_qos1 = 2,
@@ -89,10 +98,12 @@ enum mosquitto_msg_state {
 	mosq_ms_resend_pubcomp = 8,
 	mosq_ms_wait_for_pubcomp = 9,
 	mosq_ms_send_pubrec = 10,
-	mosq_ms_queued = 11
+	mosq_ms_queued = 11,
+	mosq_ms_stored = 12
 };
 
-enum mosquitto_client_state {
+enum mosquitto_client_state
+{
 	mosq_cs_new = 0,
 	mosq_cs_connected = 1,
 	mosq_cs_disconnecting = 2,
@@ -111,12 +122,13 @@ enum mosquitto_client_state {
 	mosq_cs_expiring = 15,
 	mosq_cs_duplicate = 17, /* client that has been taken over by another with the same id */
 	mosq_cs_disconnect_with_will = 18,
-	mosq_cs_disused = 19, /* client that has been added to the disused list to be freed */
-	mosq_cs_authenticating = 20, /* Client has sent CONNECT but is still undergoing extended authentication */
+	mosq_cs_disused = 19,		   /* client that has been added to the disused list to be freed */
+	mosq_cs_authenticating = 20,   /* Client has sent CONNECT but is still undergoing extended authentication */
 	mosq_cs_reauthenticating = 21, /* Client is undergoing reauthentication and shouldn't do anything else until complete */
 };
 
-enum mosquitto__protocol {
+enum mosquitto__protocol
+{
 	mosq_p_invalid = 0,
 	mosq_p_mqtt31 = 1,
 	mosq_p_mqtt311 = 2,
@@ -124,32 +136,36 @@ enum mosquitto__protocol {
 	mosq_p_mqtt5 = 5,
 };
 
-enum mosquitto__threaded_state {
-	mosq_ts_none,		/* No threads in use */
-	mosq_ts_self,		/* Threads started by libmosquitto */
-	mosq_ts_external	/* Threads started by external code */
+enum mosquitto__threaded_state
+{
+	mosq_ts_none,	 /* No threads in use */
+	mosq_ts_self,	 /* Threads started by libmosquitto */
+	mosq_ts_external /* Threads started by external code */
 };
 
-enum mosquitto__transport {
+enum mosquitto__transport
+{
 	mosq_t_invalid = 0,
 	mosq_t_tcp = 1,
 	mosq_t_ws = 2,
 	mosq_t_sctp = 3
 };
 
-
-struct mosquitto__alias{
+struct mosquitto__alias
+{
 	char *topic;
 	uint16_t alias;
 };
 
-struct session_expiry_list {
+struct session_expiry_list
+{
 	struct mosquitto *context;
 	struct session_expiry_list *prev;
 	struct session_expiry_list *next;
 };
 
-struct mosquitto__packet{
+struct mosquitto__packet
+{
 	uint8_t *payload;
 	struct mosquitto__packet *next;
 	uint32_t remaining_mult;
@@ -162,7 +178,8 @@ struct mosquitto__packet{
 	int8_t remaining_count;
 };
 
-struct mosquitto_message_all{
+struct mosquitto_message_all
+{
 	struct mosquitto_message_all *next;
 	struct mosquitto_message_all *prev;
 	mosquitto_property *properties;
@@ -174,22 +191,26 @@ struct mosquitto_message_all{
 };
 
 #ifdef WITH_TLS
-enum mosquitto__keyform {
+enum mosquitto__keyform
+{
 	mosq_k_pem = 0,
 	mosq_k_engine = 1,
 };
 #endif
 
-struct will_delay_list {
+struct will_delay_list
+{
 	struct mosquitto *context;
 	struct will_delay_list *prev;
 	struct will_delay_list *next;
 };
 
-struct mosquitto_msg_data{
+struct mosquitto_msg_data
+{
 #ifdef WITH_BROKER
 	struct mosquitto_client_msg *inflight;
 	struct mosquitto_client_msg *queued;
+	struct mosquitto_client_msg *stored; // 20230116新增一個stored用來暫存大檔案
 	long msg_bytes;
 	long msg_bytes12;
 	int msg_count;
@@ -197,16 +218,16 @@ struct mosquitto_msg_data{
 #else
 	struct mosquitto_message_all *inflight;
 	int queue_len;
-#  ifdef WITH_THREADING
+#ifdef WITH_THREADING
 	pthread_mutex_t mutex;
-#  endif
+#endif
 #endif
 	int inflight_quota;
 	uint16_t inflight_maximum;
 };
 
-
-struct mosquitto {
+struct mosquitto
+{
 #if defined(WITH_BROKER) && defined(WITH_EPOLL)
 	/* This *must* be the first element in the struct. */
 	int ident;
@@ -230,6 +251,13 @@ struct mosquitto {
 	time_t last_msg_in;
 	time_t next_msg_out;
 	time_t ping_t;
+	// 20230209 Changes
+	//  time_t last_test;
+	//  time_t next_test;
+	//  time_t latency_t;
+	time_t latency_t;			//20230321 Changes test latency
+	time_t send_lat_t;			//20230321 Changes the time that send latency.
+	enum transfer_mode mode; 	// 20230320 Changes 加上transfer mode： 0為normal mode, 1為slow mode,還沒初始化
 	struct mosquitto__packet in_packet;
 	struct mosquitto__packet *current_out_packet;
 	struct mosquitto__packet *out_packet;
@@ -276,6 +304,7 @@ struct mosquitto {
 	pthread_mutex_t state_mutex;
 	pthread_mutex_t mid_mutex;
 	pthread_t thread_id;
+	pthread_mutex_t mode_mutex;	//20230321 Changes transfer_mode的mutex
 #endif
 	bool clean_start;
 	time_t session_expiry_time;
@@ -293,21 +322,21 @@ struct mosquitto {
 	struct mosquitto__client_sub **subs;
 	char *auth_method;
 	int sub_count;
-#  ifndef WITH_EPOLL
+#ifndef WITH_EPOLL
 	int pollfd_index;
-#  endif
-#  ifdef WITH_WEBSOCKETS
+#endif
+#ifdef WITH_WEBSOCKETS
 	struct lws *wsi;
-#  endif
+#endif
 	bool ws_want_write;
 	bool assigned_id;
 #else
-#  ifdef WITH_SOCKS
+#ifdef WITH_SOCKS
 	char *socks5_host;
 	uint16_t socks5_port;
 	char *socks5_username;
 	char *socks5_password;
-#  endif
+#endif
 	void *userdata;
 	bool in_callback;
 	struct mosquitto_msg_data msgs_in;
@@ -337,9 +366,9 @@ struct mosquitto {
 	char threaded;
 	struct mosquitto__packet *out_packet_last;
 	mosquitto_property *connect_properties;
-#  ifdef WITH_SRV
+#ifdef WITH_SRV
 	ares_channel achan;
-#  endif
+#endif
 #endif
 	uint8_t max_qos;
 	uint8_t retain_available;
@@ -360,4 +389,3 @@ struct mosquitto {
 void do_client_disconnect(struct mosquitto *mosq, int reason_code, const mosquitto_property *properties);
 
 #endif
-

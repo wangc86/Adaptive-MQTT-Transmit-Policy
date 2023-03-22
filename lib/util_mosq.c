@@ -59,8 +59,46 @@ Contributors:
 #include <libwebsockets.h>
 #endif
 
+//20230209 Change 偵測latency
+// int latency_detection(struct mosquitto *mosq){
+// 	time_t next_test;
+// 	time_t last_test;
+// 	time_t now_time;
+// 	int threshold_t; //20230209多久傳一次latency packet
+// #ifndef WITH_BROKER
+// 	int rc;
+// #endif
+// 	enum mosquitto_client_state state;
+
+// 	assert(mosq);
+// #ifdef WITH_BROKER
+// 	now = db.now_s;
+// #else
+// 	now_time = mosquitto_time();
+// #endif
+// 	pthread_mutex_lock(&mosq->msgtime_mutex);
+// 	next_test = mosq->next_test;
+// 	last_test = mosq->last_test;
+// 	pthread_mutex_unlock(&mosq->msgtime_mutex);
+// 	if(now_time >= next_test || now_time - last_test >= threshold_t){
+// 		state = mosquitto__get_state(mosq);
+// 		if(state == mosq_cs_active && mosq->ping_t == 0){
+// 			send__pingreq(mosq);
+// 			/* Reset last msg times to give the server time to send a pingresp */
+// 			pthread_mutex_lock(&mosq->msgtime_mutex);
+// 			mosq->last_test = now_time;
+// 			mosq->next_test = now_time +threshold_t;
+// 			pthread_mutex_unlock(&mosq->msgtime_mutex);
+// 		}else{
+// 			return rc;
+// 		}
+// 	}
+// 	return MOSQ_ERR_SUCCESS;
+// }
+
 int mosquitto__check_keepalive(struct mosquitto *mosq)
 {
+	printf("mosquitto__check_keepalive");
 	time_t next_msg_out;
 	time_t last_msg_in;
 	time_t now;
@@ -75,7 +113,7 @@ int mosquitto__check_keepalive(struct mosquitto *mosq)
 #else
 	now = mosquitto_time();
 #endif
-
+	// printf("\nmosquitto_time(): %ld\n",mosquitto_time());
 #if defined(WITH_BROKER) && defined(WITH_BRIDGE)
 	/* Check if a lazy bridge should be timed out due to idle. */
 	if(mosq->bridge && mosq->bridge->start_type == bst_lazy
@@ -296,4 +334,30 @@ enum mosquitto_client_state mosquitto__get_state(struct mosquitto *mosq)
 	pthread_mutex_unlock(&mosq->state_mutex);
 
 	return state;
+}
+
+//20230321 Changes for transfer mode set and get by using mutex
+int mosquitto__set_mode(struct mosquitto *mosq, enum transfer_mode mode)
+{
+	pthread_mutex_lock(&mosq->mode_mutex);
+#ifdef WITH_BROKER
+	if(mosq->state != mosq_cs_disused)
+#endif
+	{
+		mosq->mode = mode;
+	}
+	pthread_mutex_unlock(&mosq->mode_mutex);
+
+	return MOSQ_ERR_SUCCESS;
+}
+// /20230321 Changes for transfer mode set and get by using mutex
+enum transfer_mode mosquitto__get_mode(struct mosquitto *mosq)
+{
+	enum transfer_mode mode;
+
+	pthread_mutex_lock(&mosq->mode_mutex);
+	mode = mosq->mode;
+	pthread_mutex_unlock(&mosq->mode_mutex);
+
+	return mode;
 }
