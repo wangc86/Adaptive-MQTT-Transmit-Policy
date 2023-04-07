@@ -5,8 +5,10 @@ The new design is implement on mosuqitto, an open source MQTT implementation.
 Excepct the broker, you can use implementation of MQTT to run your client.
 
 ## Installing on Linux
-Download the whole file and run it by
-    m
+Download the whole file and run it by make
+```ruby
+make
+```
 
 Eclipse Mosquitto
 =================
