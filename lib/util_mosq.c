@@ -59,43 +59,6 @@ Contributors:
 #include <libwebsockets.h>
 #endif
 
-//20230209 Change 偵測latency
-// int latency_detection(struct mosquitto *mosq){
-// 	time_t next_test;
-// 	time_t last_test;
-// 	time_t now_time;
-// 	int threshold_t; //20230209多久傳一次latency packet
-// #ifndef WITH_BROKER
-// 	int rc;
-// #endif
-// 	enum mosquitto_client_state state;
-
-// 	assert(mosq);
-// #ifdef WITH_BROKER
-// 	now = db.now_s;
-// #else
-// 	now_time = mosquitto_time();
-// #endif
-// 	pthread_mutex_lock(&mosq->msgtime_mutex);
-// 	next_test = mosq->next_test;
-// 	last_test = mosq->last_test;
-// 	pthread_mutex_unlock(&mosq->msgtime_mutex);
-// 	if(now_time >= next_test || now_time - last_test >= threshold_t){
-// 		state = mosquitto__get_state(mosq);
-// 		if(state == mosq_cs_active && mosq->ping_t == 0){
-// 			send__pingreq(mosq);
-// 			/* Reset last msg times to give the server time to send a pingresp */
-// 			pthread_mutex_lock(&mosq->msgtime_mutex);
-// 			mosq->last_test = now_time;
-// 			mosq->next_test = now_time +threshold_t;
-// 			pthread_mutex_unlock(&mosq->msgtime_mutex);
-// 		}else{
-// 			return rc;
-// 		}
-// 	}
-// 	return MOSQ_ERR_SUCCESS;
-// }
-
 int mosquitto__check_keepalive(struct mosquitto *mosq)
 {
 	printf("mosquitto__check_keepalive");

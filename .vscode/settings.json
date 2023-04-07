@@ -4,6 +4,15 @@
         "type_traits": "c",
         "cstring": "c",
         "utlist.h": "c",
-        "export": "c"
+        "export": "c",
+        "property_mosq.h": "c",
+        "config.h": "c",
+        "*.tcc": "c",
+        "string": "c",
+        "vector": "c",
+        "fstream": "c",
+        "limits": "c",
+        "sstream": "c",
+        "utility": "c"
     }
 }

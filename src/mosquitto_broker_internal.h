@@ -38,6 +38,9 @@ Contributors:
 #include "password_mosq.h"
 #include "tls_mosq.h"
 #include "uthash.h"
+#include <time.h>		//20230323
+#include <unistd.h>		//20230323
+#include <stdio.h>		//20230323
 
 #ifndef __GNUC__
 #define __attribute__(attrib)
@@ -89,6 +92,11 @@ typedef int (*FUNC_auth_plugin_acl_check_v2)(void *, const char *, const char *,
 typedef int (*FUNC_auth_plugin_unpwd_check_v2)(void *, const char *, const char *);
 typedef int (*FUNC_auth_plugin_psk_key_get_v2)(void *, const char *, const char *, char *, int);
 
+//==========//20230323 Changes 給我的timer用的 ==========
+// timer_t timerid;            //定時器ID      
+// struct sigevent sev;        //指定了定時器到期要產生的異步通知
+// struct itimerspec its;      //超時結構體
+// struct sigaction sa;        //超時要觸發的signal
 
 enum mosquitto_msg_origin{
 	mosq_mo_client = 0,
@@ -306,6 +314,7 @@ struct mosquitto__config {
 	struct mosquitto__security_options security_options;
 	//20230209
 	size_t threshold_s;	//20230209Changes threshold for packet size,0321型態從int改為size_t
+	int threshold_l;	//20230330 Changes
 };
 
 
@@ -600,6 +609,9 @@ void config__cleanup(struct mosquitto__config *config);
 int config__get_dir_files(const char *include_dir, char ***files, int *file_count);
 
 int drop_privileges(struct mosquitto__config *config);
+void *lat_thread();									//20230330
+void timeout_handler(int signum);					//20230329
+timer_t create_the_timer(int sig, int sec);			//20230329
 
 /* ============================================================
  * Server send functions
@@ -671,8 +683,8 @@ int db__message_write_inflight_out_latest(struct mosquitto *context);
 int db__message_write_queued_out(struct mosquitto *context);
 int db__message_write_queued_in(struct mosquitto *context);
 //20230116 自己新增的部分( write by Maggie)
-void db__message_destored_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data);
-int db__message_write_stored_out(struct mosquitto *context);
+void db__message_destorage_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data);
+int db__message_write_storage_out(struct mosquitto *context);
 
 /* ============================================================
  * Subscription functions

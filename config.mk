@@ -190,9 +190,9 @@ else
 endif
 
 ifeq ($(UNAME),Linux)
-	BROKER_LDADD:=$(BROKER_LDADD) -lrt
+	BROKER_LDADD:=$(BROKER_LDADD) -lrt -lpthread
 	BROKER_LDFLAGS:=$(BROKER_LDFLAGS) -Wl,--dynamic-list=linker.syms
-	LIB_LIBADD:=$(LIB_LIBADD) -lrt
+	LIB_LIBADD:=$(LIB_LIBADD) -lrt -lpthread
 endif
 
 ifeq ($(WITH_SHARED_LIBRARIES),yes)

@@ -20,14 +20,12 @@ Contributors:
 
 #include <stdio.h>
 #include <string.h>
-
+#include <utlist.h>
 #include "mosquitto_broker_internal.h"
 #include "memory_mosq.h"
 #include "mqtt_protocol.h"
 #include "packet_mosq.h"
 #include "property_mosq.h"
-
-
 
 int handle__subscribe(struct mosquitto *context)
 {

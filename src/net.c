@@ -181,8 +181,8 @@ struct mosquitto *net__socket_accept(struct mosquitto__listener_sock *listensock
 			log__printf(NULL, MOSQ_LOG_WARNING, "Warning: Unable to set TCP_NODELAY.");
 		}
 	}
-
 	new_context = context__init(new_sock);
+	// printf("src/net.c--net__socket_accept\n");		//20230323 Note client connect
 	if(!new_context){
 		COMPAT_CLOSE(new_sock);
 		return NULL;

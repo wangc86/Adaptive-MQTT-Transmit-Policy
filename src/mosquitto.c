@@ -39,7 +39,11 @@ Contributors:
 
 #include <errno.h>
 #include <signal.h>
-#include <stdio.h>
+#include <time.h>		//20230323
+#include <unistd.h>		//20230323
+#include <stdio.h>		//20230323
+#include <utlist.h>		//20230323
+#include <pthread.h>	//20230329
 #include <string.h>
 #ifdef WITH_SYSTEMD
 #  include <systemd/sd-daemon.h>
@@ -435,6 +439,73 @@ static int pid__write(void)
 	return MOSQ_ERR_SUCCESS;
 }
 
+//20230329
+void* lat_thread(void *arg){
+	// system("./timer_exp.o");
+	printf("In the thread...\n");
+	FILE *fptr;
+	fptr = fopen("test.txt","w");
+	if(fptr == NULL)
+	{
+		printf("Error!");   
+		exit(1);
+	}
+	fprintf(fptr,"%s","help!!!");
+   	fclose(fptr);
+	
+	log__printf(NULL, MOSQ_LOG_DEBUG, "!!!!!!In the thread...!!!!!!\n\n");
+	pthread_exit(NULL);
+}
+
+// 20230323 Changes
+void timeout_handler(int signum)
+{
+	// int rc;
+	// struct mosquitto *context, *ctxt_tmp;
+	//db.contexts_by_sock是client list(含publisher, subscriber)
+	// HASH_ITER(hh_sock, db.contexts_by_sock, context, ctxt_tmp){
+	// 	printf("Client ID: %s\n",context->id);
+	// }
+	//20230329 20230330建立新的thread
+	// printf("!!!!!!pthread_create!!!!!!\n\n");
+	// pthread_t tid; // 宣告 pthread 變數
+	// pthread_create(&tid, NULL, lat_thread, NULL);
+	// pthread_join(tid, NULL);
+	printf(".\n");
+	//mid 先隨便設一個數，因為我還不知道怎麼建沒人用的mid
+    
+	// log__printf(NULL, MOSQ_LOG_DEBUG, "!!!!!!Timeout!!!!!!\n\n");
+	// timer_settime(timerid, 0, &its, NULL);
+}
+
+
+timer_t create_the_timer(int sig, int sec){
+	timer_t timerid;            //定時器ID      
+    struct sigevent sev;        //指定了定時器到期要產生的異步通知
+    struct itimerspec its;      //超時結構體
+    struct sigaction sa;        //超時要觸發的signal
+
+    sa.sa_handler = timeout_handler;    //time out的處理function
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if(sigaction(sig, &sa, NULL) == -1)
+        perror("sigaction");
+
+    sev.sigev_notify = SIGEV_SIGNAL;
+    sev.sigev_signo = sig;
+    sev.sigev_value.sival_ptr = &timerid;
+	log__printf(NULL, MOSQ_LOG_DEBUG, "create the timer...............\n\n");
+    if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
+        perror("timer_create");
+
+    its.it_value.tv_sec = sec;                      //表示定時器的第一次超時時間
+    its.it_value.tv_nsec = 0;
+    its.it_interval.tv_sec = its.it_value.tv_sec;   //表示定時器第一次超時以後的超時時間間隔
+    its.it_interval.tv_nsec = its.it_value.tv_nsec;
+    if(timer_settime(timerid, 0, &its, NULL) == -1)
+        perror("timer_settime");
+    return timerid;
+}
 
 int main(int argc, char *argv[])
 {
@@ -559,8 +630,8 @@ int main(int argc, char *argv[])
 #endif
 
 	run = 1;
+	// create_the_timer(SIGUSR1,3);				//20230323 Changes放在這裡在執行其他封包處理的時候不會觸發到
 	rc = mosquitto_main_loop(listensock, listensock_count);
-
 	log__printf(NULL, MOSQ_LOG_INFO, "mosquitto version %s terminating", VERSION);
 
 	/* FIXME - this isn't quite right, all wills with will delay zero should be
@@ -645,9 +716,3 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return rc;
 }
 #endif
-
-//20230321 broker timer進行中，還沒完成
-// void brokertimer() // e4: timer
-// {
-
-// }

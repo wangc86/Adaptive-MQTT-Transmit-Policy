@@ -33,7 +33,8 @@ Contributors:
 #endif
 #include <stdlib.h>
 
-#if defined(WITH_THREADING) && !defined(WITH_BROKER)
+// #if defined(WITH_THREADING) && !defined(WITH_BROKER)
+#if defined(WITH_THREADING)	//20230330
 #include <pthread.h>
 #else
 #include <dummypthread.h>
@@ -99,7 +100,7 @@ enum mosquitto_msg_state
 	mosq_ms_wait_for_pubcomp = 9,
 	mosq_ms_send_pubrec = 10,
 	mosq_ms_queued = 11,
-	mosq_ms_stored = 12
+	mosq_ms_storage = 12
 };
 
 enum mosquitto_client_state
@@ -210,7 +211,8 @@ struct mosquitto_msg_data
 #ifdef WITH_BROKER
 	struct mosquitto_client_msg *inflight;
 	struct mosquitto_client_msg *queued;
-	struct mosquitto_client_msg *stored; // 20230116新增一個stored用來暫存大檔案
+	struct mosquitto_client_msg *storage; // 20230116新增一個storage用來暫存大檔案
+	struct mosquitto_client_msg *lat_list;//20230329 Changes專門放準備傳的latency packet
 	long msg_bytes;
 	long msg_bytes12;
 	int msg_count;
@@ -254,9 +256,10 @@ struct mosquitto
 	// 20230209 Changes
 	//  time_t last_test;
 	//  time_t next_test;
-	//  time_t latency_t;
-	time_t latency_t;			//20230321 Changes test latency
-	time_t send_lat_t;			//20230321 Changes the time that send latency.
+	struct timespec latency_t;		//20230330
+	struct timespec send_time;		//20230330
+	// time_t latency_t;			//20230321 Changes test latency
+	// time_t send_lat_t;			//20230321 Changes the time that send latency.
 	enum transfer_mode mode; 	// 20230320 Changes 加上transfer mode： 0為normal mode, 1為slow mode,還沒初始化
 	struct mosquitto__packet in_packet;
 	struct mosquitto__packet *current_out_packet;

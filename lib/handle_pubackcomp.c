@@ -119,17 +119,44 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 	}
 
 #ifdef WITH_BROKER
+	// printf("mosq->send_time.tv_sec: %ld\n",mosq->send_time.tv_sec);
+	// 1108 timestamps of broker (receive the PUBACK)
+	if(mosq->send_time.tv_sec>0 && qos==1){
 
-	//1108 timestamps of broker (receive the PUBACK)
-	// struct timespec tp;
-	// if(clock_gettime(CLOCK_MONOTONIC, &tp))
-	// {
-	// 	perror("client/pub_client.c: my_publsih");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+		struct timespec tp;
+		if(clock_gettime(CLOCK_MONOTONIC, &tp))
+		{
+			perror("client/pub_client.c: my_publsih");
+			exit(EXIT_FAILURE);
+		}
+		// printf("Broker received PubAck: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+		//20230330
+		mosq->latency_t.tv_sec = tp.tv_sec - mosq->send_time.tv_sec;
+		mosq->latency_t.tv_nsec = tp.tv_nsec - mosq->send_time.tv_nsec;
+		long int tmp_lat = mosq->latency_t.tv_sec*1000000 + mosq->latency_t.tv_nsec/1000;
+		printf("\n%s latency: %ld\n",mosq->id,tmp_lat);
+		//20230330判斷大於threshold_l的話切換成slow_mode
+		if(tmp_lat>=db.config->threshold_l && (mosquitto__get_mode(mosq)==normal_mode)){
+			mosquitto__set_mode(mosq, slow_mode);
+			printf("Mode Change...\n");
+			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <slow_mode>", mosq->id);
+		}else if(tmp_lat<db.config->threshold_l && (mosquitto__get_mode(mosq)==slow_mode)){
+			mosquitto__set_mode(mosq, normal_mode);
+			printf("Mode Change...\n");
+			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <normal_mode>", mosq->id);
+		}
+		else{}
+		if(mosquitto__get_mode(mosq)==slow_mode)
+			log__printf(NULL, MOSQ_LOG_DEBUG, "%s : <slow_mode>\n", mosq->id);
+		else
+			log__printf(NULL, MOSQ_LOG_DEBUG, "%s : <normal_mode>\n", mosq->id);
+		printf("Check out the msg in storage which need to append to inflight....\n");
+		rc = db__message_write_storage_out(mosq);
+		if(rc) return rc;	
+		mosq->send_time.tv_sec=0;
+	}		
 
-	// log__printf(NULL, MOSQ_LOG_DEBUG, "Received %s from %s (Mid: %d, RC:%d)", type, mosq->id, mid, reason_code);
+	log__printf(NULL, MOSQ_LOG_DEBUG, "Received %s from %s (Mid: %d, RC:%d)", type, mosq->id, mid, reason_code);
 
 	/* Immediately free, we don't do anything with Reason String or User Property at the moment */
 	mosquitto_property_free_all(&properties);

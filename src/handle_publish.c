@@ -36,6 +36,7 @@ Contributors:
 
 int handle__publish(struct mosquitto *context)
 {
+	// printf("context->in_packet.command: %d",context->in_packet.command);
 	uint8_t dup;
 	int rc = 0;
 	int rc2;
@@ -109,7 +110,7 @@ int handle__publish(struct mosquitto *context)
 			db__msg_store_free(msg);
 			return MOSQ_ERR_MALFORMED_PACKET;
 		}
-		printf("\n--mid--: %d\n", mid);
+		// printf("\n--mid--: %d\n", mid);
 		if(mid == 0){
 			db__msg_store_free(msg);
 			return MOSQ_ERR_PROTOCOL;
@@ -263,8 +264,8 @@ int handle__publish(struct mosquitto *context)
 		return rc;
 	}
 
-	printf("--header---: %d\n", context->in_packet.command);
-	printf("--payload--: %p\n\n", msg->payload);
+	// printf("--header---: %d\n", context->in_packet.command);
+	// printf("--payload--: %p\n\n", msg->payload);
 
 	// //1108 timestamps of broker (receive the PUBLISH) //{}aviod the error of goto process_bad_message
 	// {

@@ -50,6 +50,7 @@ int handle__pingreq(struct mosquitto *mosq)
 
 #ifdef WITH_BROKER
 	log__printf(NULL, MOSQ_LOG_DEBUG, "Received PINGREQ from %s", mosq->id);
+	
 #else
 	return MOSQ_ERR_PROTOCOL;
 #endif

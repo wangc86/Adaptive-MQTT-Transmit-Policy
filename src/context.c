@@ -47,6 +47,7 @@ struct mosquitto *context__init(mosq_sock_t sock)
 #endif
 	mosquitto__set_state(context, mosq_cs_new);
 	mosquitto__set_mode(context, slow_mode);	//20230321 Changes 當context初始化時也要初始化mode(init為normal mode)
+	context->send_time.tv_sec=0;						//20230406 Changes 初始化send_time
 	context->sock = sock;
 	context->last_msg_in = db.now_s;
 	context->next_msg_out = db.now_s + 60;

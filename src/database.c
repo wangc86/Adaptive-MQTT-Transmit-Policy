@@ -37,7 +37,7 @@ Contributors:
  */
 bool db__ready_for_flight(struct mosquitto *context, enum mosquitto_msg_direction dir, int qos)
 {
-	printf("...db__ready_for_flight...\n");
+	// printf("...db__ready_for_flight...\n");
 	struct mosquitto_msg_data *msgs;
 	bool valid_bytes;
 	bool valid_count;
@@ -58,7 +58,7 @@ bool db__ready_for_flight(struct mosquitto *context, enum mosquitto_msg_directio
 		 * There is no queueing option, unless the client is offline and
 		 * queue_qos0_messages is enabled.
 		 */
-		printf("db.config->max_queued_messages: %d\n", db.config->max_queued_messages);
+		// printf("db.config->max_queued_messages: %d\n", db.config->max_queued_messages);
 		if(db.config->max_queued_messages == 0 && db.config->max_inflight_bytes == 0){
 			return true;
 		}
@@ -337,16 +337,16 @@ void db__message_dequeue_first(struct mosquitto *context, struct mosquitto_msg_d
 	}
 }
 
-void db__message_destored_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data)
+void db__message_destorage_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data)
 {
-	printf("...db__message_destored_first... \n");
-	printf("***Destored msg(%i)*** \n\n",msg_data->stored->mid);
+	printf("...db__message_destorage_first... \n");
+	printf("***Destorage msg(%i)*** \n\n",msg_data->storage->mid);
 	struct mosquitto_client_msg *msg;
 
 	UNUSED(context);
 
-	msg = msg_data->stored;
-	DL_DELETE(msg_data->stored, msg);
+	msg = msg_data->storage;
+	DL_DELETE(msg_data->storage, msg);
 	DL_APPEND(msg_data->inflight, msg);
 	if(msg_data->inflight_quota > 0){
 		msg_data->inflight_quota--;
@@ -404,7 +404,7 @@ int db__message_delete_outgoing(struct mosquitto *context, uint16_t mid, enum mo
 
 int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_msg_direction dir, uint8_t qos, bool retain, struct mosquitto_msg_store *stored, mosquitto_property *properties, bool update)
 {
-	printf("...db__message_insert...\n");
+	// printf("...db__message_insert...\n");
 	struct mosquitto_client_msg *msg;
 	struct mosquitto_msg_data *msg_data;
 	enum mosquitto_msg_state state = mosq_ms_invalid;
@@ -413,8 +413,10 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 	char **dest_ids;
 
 	assert(stored);
-	printf("---context->id---: %s\n",context->id);
-	printf("---context->mode---: %d\n",context->mode);
+	printf("---mid---: %d\n",mid);
+	printf("---topic---: %s\n",stored->topic);
+	printf("---Sub id---: %s\n",context->id);
+	printf("---Sub mode---: %d\n",context->mode);
 	if(!context) return MOSQ_ERR_INVAL;
 	if(!context->id) return MOSQ_ERR_SUCCESS; /* Protect against unlikely "client is disconnected but not entirely freed" scenario */
 
@@ -423,7 +425,6 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 	}else{
 		msg_data = &context->msgs_in;
 	}
-
 	/* Check whether we've already sent this message to this client
 	 * for outgoing messages only.
 	 * If retain==true then this is a stale retained message and so should be
@@ -465,13 +466,13 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 	// msg_data->msg_bytes+= msg->store->payloadlen;	//20230119為了要取得payloadlen把下面執行的那行移上來
 	if(context->sock != INVALID_SOCKET){
 		//---20230112 Change 在這裡可以把message改為加入queue而不是加入inflight
-		printf("---stored->payloadlen---: %d\n",stored->payloadlen);
-		if(stored->payloadlen>db.config->threshold_s && context->mode==slow_mode){		//20230209 db.config->threshold_s ,20230321 Changes 加入mode條件
+		printf("---stored->payloadlen---: %d\n\n",stored->payloadlen);
+		if(stored->payloadlen>db.config->threshold_s && context->mode==slow_mode && strcmp(stored->topic,"latency")){		//20230209 db.config->threshold_s ,20230321 Changes 加入mode條件
 			// if (db__ready_for_queue(context, qos, msg_data)){
 			// 	state = mosq_ms_queued;
 			// }
-			printf("****payloadlen>threshold_s, msg->state = mosq_ms_stored****\n");
-			state = mosq_ms_stored;		//20230116把qos=1的message狀態改為mosq_ms_stored
+			printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
+			state = mosq_ms_storage;		//20230116把qos=1的message狀態改為mosq_ms_storage
 		}//20230112 Change----
 		// if(db__ready_for_flight(context, dir, qos)){	  //20230112 Ori----
 		else if(db__ready_for_flight(context, dir, qos)){ //20230112 Change----
@@ -555,9 +556,9 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 	if(state == mosq_ms_queued){
 		printf("****append msg(%i) to queue****\n", msg->mid);
 		DL_APPEND(msg_data->queued, msg);
-	}else if(state==mosq_ms_stored){		//20230116把訊息append到stored裡暫存
-		printf("****append msg(%i) to stored****\n", msg->mid);
-		DL_APPEND(msg_data->stored, msg);
+	}else if(state==mosq_ms_storage){		//20230116把訊息append到storage裡暫存
+		printf("****append msg(%i) to storage****\n", msg->mid);
+		DL_APPEND(msg_data->storage, msg);
 	}else{
 		printf("****append msg(%i) to inflight****\n", msg->mid);
 		DL_APPEND(msg_data->inflight, msg);
@@ -607,7 +608,7 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 		if(rc) return rc;
 		rc = db__message_write_queued_out(context);	//2023筆記: 這裡會把queue裡的message丟出來
 		if(rc) return rc;
-		rc = db__message_write_stored_out(context);	//20230116這裡會把stored裡的message丟出來
+		rc = db__message_write_storage_out(context);	//20230116這裡會把storage裡的message丟出來
 		if(rc) return rc;							//20230116接續
 	}
 
@@ -1027,10 +1028,10 @@ int db__message_release_incoming(struct mosquitto *context, uint16_t mid)
 		return MOSQ_ERR_NOT_FOUND;
 	}
 }
-
+//這裡的context就是要送出的client?!!
 static int db__message_write_inflight_out_single(struct mosquitto *context, struct mosquitto_client_msg *msg)
 {
-	printf("db__message_write_inflight_out_single\n");
+	// printf("db__message_write_inflight_out_single\n");
 	mosquitto_property *cmsg_props = NULL, *store_props = NULL;
 	int rc;
 	uint16_t mid;
@@ -1123,7 +1124,7 @@ static int db__message_write_inflight_out_single(struct mosquitto *context, stru
 		case mosq_ms_wait_for_pubrel:
 		case mosq_ms_wait_for_pubcomp:
 		case mosq_ms_queued:
-		case mosq_ms_stored:		//20230321Changes 加入自己新增的狀態
+		case mosq_ms_storage:		//20230321Changes 加入自己新增的狀態
 			break;
 	}
 	return MOSQ_ERR_SUCCESS;
@@ -1132,7 +1133,7 @@ static int db__message_write_inflight_out_single(struct mosquitto *context, stru
 
 int db__message_write_inflight_out_all(struct mosquitto *context)
 {
-	printf("db__message_write_inflight_out_all\n");
+	// printf("db__message_write_inflight_out_all\n");
 	struct mosquitto_client_msg *tail, *tmp;
 	int rc;
 
@@ -1150,7 +1151,7 @@ int db__message_write_inflight_out_all(struct mosquitto *context)
 
 int db__message_write_inflight_out_latest(struct mosquitto *context)
 {
-	printf("db__message_write_inflight_out_latest\n");
+	// printf("db__message_write_inflight_out_latest\n");
 	struct mosquitto_client_msg *tail, *next;
 	int rc;
 
@@ -1196,14 +1197,14 @@ int db__message_write_inflight_out_latest(struct mosquitto *context)
 
 int db__message_write_queued_in(struct mosquitto *context)
 {
-	printf("...db__message_write_queued_in...\n");
+	// printf("...db__message_write_queued_in...\n");
 	struct mosquitto_client_msg *tail, *tmp;
 	int rc;
-
+	
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;
 	}
-	printf("...db__message_write_queued_in2...\n");
+	// printf("...db__message_write_queued_in2...\n");
 	DL_FOREACH_SAFE(context->msgs_in.queued, tail, tmp){
 		printf("...db__message_write_queued_in3...\n");
 		if(context->msgs_out.inflight_maximum != 0 && context->msgs_in.inflight_quota == 0){
@@ -1227,7 +1228,7 @@ int db__message_write_queued_in(struct mosquitto *context)
 
 int db__message_write_queued_out(struct mosquitto *context)
 {
-	printf("...db__message_write_queued_out...\n");
+	// printf("...db__message_write_queued_out...\n");
 	struct mosquitto_client_msg *tail, *tmp;
 
 	if(context->state != mosq_cs_active){
@@ -1255,21 +1256,24 @@ int db__message_write_queued_out(struct mosquitto *context)
 }
 
 //20230116
-int db__message_write_stored_out(struct mosquitto *context)
+int db__message_write_storage_out(struct mosquitto *context)
 {
-	printf("...db__message_write_stored_out...\n");
+	// printf("...db__message_write_storage_out...\n");
+	printf("CONTEXT_ID: %s\n", context->id);
+	int count=0;
 	struct mosquitto_client_msg *tail, *tmp, *elt;	//20230316 Changes後面用到DL_COUNT跟DL_FOREACH_SAFE需要的
+	DL_COUNT(context->msgs_out.storage, elt, count);		//20230316 Changees 為了計算storage裡有幾個message，可以拿掉，對功能來說沒有用處，Debug用
+	printf("#storage: %d\n",count);
+	
 
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;
 	}
-	if(context->mode!=normal_mode){					//20230321 Changes client不是normal_mode的話就不會destored
+	if(context->mode!=normal_mode){					//20230321 Changes client不是normal_mode的話就不會destorage
 		return MOSQ_ERR_SUCCESS;
 	}
-	int count=0;
-	DL_COUNT(context->msgs_out.stored, elt, count);		//20230316 Changees 為了計算stored裡有幾個message，可以拿掉，對功能來說沒有用處，Debug用
-	printf("#stored: %d\n",count);
-	DL_FOREACH_SAFE(context->msgs_out.stored, tail, tmp){
+	
+	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){
 		if(context->msgs_out.inflight_maximum != 0 && context->msgs_out.inflight_quota == 0){
 			break;
 		}
@@ -1284,9 +1288,11 @@ int db__message_write_stored_out(struct mosquitto *context)
 				tail->state = mosq_ms_publish_qos2;
 				break;
 		}
-		// if(mode==)													//2023加上判斷現在是哪個mode
-		// printf("****Destored****\n");
-		db__message_destored_first(context, &context->msgs_out);		//20230116自己新增的function
+		// if(mode==normal_mode){			//2023加上判斷現在是哪個mode
+		// 	printf("****Destorage****\n");
+			db__message_destorage_first(context, &context->msgs_out);		//20230116自己新增的function
+		// }													
+		
 	}
 	return MOSQ_ERR_SUCCESS;
 }

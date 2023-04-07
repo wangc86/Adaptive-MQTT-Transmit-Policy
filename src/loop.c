@@ -186,7 +186,7 @@ int mosquitto_main_loop(struct mosquitto__listener_sock *listensock, int listens
 	rc = bridge__register_local_connections();
 	if(rc) return rc;
 #endif
-
+	create_the_timer(SIGUSR1 ,3);	//20230329 Changes 建立timer，實作於mosquitto.c，第二個參數為計時器秒數
 	while(run){
 		queue_plugin_msgs();
 		context__free_disused();
@@ -195,7 +195,6 @@ int mosquitto_main_loop(struct mosquitto__listener_sock *listensock, int listens
 			sys_tree__update(db.config->sys_interval, start_time);
 		}
 #endif
-
 		keepalive__check();
 
 #ifdef WITH_BRIDGE

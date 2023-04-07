@@ -496,7 +496,7 @@ static int sub__search(struct mosquitto__subhier *subhier, char **split_topics, 
 			}
 			if(split_topics[1] == NULL){ /* End of list */
 				rc = subs__process(branch, source_id, topic, qos, retain, stored);
-				printf("\n/stored->dest_ids[0]: %s\n",*stored->dest_ids);	//20230320這裡已經找的到dest_id惹
+				// printf("\n/stored->dest_ids[0]: %s\n",*stored->dest_ids);	//20230320這裡已經找的到dest_id惹
 				if(rc == MOSQ_ERR_SUCCESS){
 					have_subscribers = true;
 				}else if(rc != MOSQ_ERR_NO_SUBSCRIBERS){
@@ -578,6 +578,7 @@ struct mosquitto__subhier *sub__add_hier_entry(struct mosquitto__subhier *parent
 
 int sub__add(struct mosquitto *context, const char *sub, uint8_t qos, uint32_t identifier, int options, struct mosquitto__subhier **root)
 {
+	// printf("//////////src/subs.c:sub__add//////////\n");
 	int rc = 0;
 	struct mosquitto__subhier *subhier;
 	const char *sharename = NULL;
