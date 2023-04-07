@@ -11,20 +11,20 @@ make
 ```
 
 ## Quick start
-Run the <Broker>
+Run the Broker
 ```
 ./src/mosquitto -c mosquitto.conf -v
 ```
-Run the <Subscriber>
+Run the Subscriber
 ```
 ./client/mosquitto_sub -t latency -t topic -p port_number -h host_ip -q 1 -i ==Sub==
 ```
-Run the <Publisher>
+Run the Publisher
 ```
 ./client/mosquitto_pub -t topic -m "Message here~~~~~~~~~~~~~~~~~~~~~~~~" -p port_number -h host_ip -q 1 -i ==Pub==
 
 ```
-You also need to run <Latency Packet Sender> to triggle this transmit policy
+You also need to run the Latency Packet Sender to triggle this transmit policy
 ```
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i ==Lat_sender==
 
