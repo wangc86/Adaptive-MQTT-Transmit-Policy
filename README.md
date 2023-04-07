@@ -6,9 +6,30 @@ Excepct the broker, you can use implementation of MQTT to run your client.
 
 ## Installing on Linux
 Download the whole file and run it by make
-```ruby
+```
 make
 ```
+
+## Quick start
+Run the <Broker>
+```
+./src/mosquitto -c mosquitto.conf -v
+```
+Run the <Subscriber>
+```
+./client/mosquitto_sub -t latency -t topic -p port_number -h host_ip -q 1 -i ==Sub==
+```
+Run the <Publisher>
+```
+./client/mosquitto_pub -t topic -m "Message here~~~~~~~~~~~~~~~~~~~~~~~~" -p port_number -h host_ip -q 1 -i ==Pub==
+
+```
+You also need to run <Latency Packet Sender> to triggle this transmit policy
+```
+./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i ==Lat_sender==
+
+```
+
 
 Eclipse Mosquitto
 =================
