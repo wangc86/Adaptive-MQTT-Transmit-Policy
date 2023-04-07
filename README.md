@@ -1,3 +1,13 @@
+Adaptive-MQTT-Transmit-Policy
+=================
+This project is a new transmit policy which design for MQTT communication protocol.
+The new design is implement on mosuqitto, an open source MQTT implementation.
+Excepct the broker, you can use implementation of MQTT to run your client.
+
+## Installing on Linux
+Download the whole file and run it by
+    m
+
 Eclipse Mosquitto
 =================
 
