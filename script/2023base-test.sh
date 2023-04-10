@@ -11,7 +11,7 @@ large_msg="Helloooooooooooooooooooooooooooooooooooooooo!!"
 # broker_host="35.173.107.238"
 
 echo "Starting the broker.."
-./src/mosquitto -c ./mosquitto.conf -v &
+./src/mosquitto -c ./mosquitto.conf -v 2 > script/bro2_output.txt &
 sleep 1
 
 echo "Starting the subscriber.."

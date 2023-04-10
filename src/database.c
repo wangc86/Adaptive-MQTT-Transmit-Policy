@@ -558,7 +558,14 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 		DL_APPEND(msg_data->queued, msg);
 	}else if(state==mosq_ms_storage){		//20230116把訊息append到storage裡暫存
 		printf("****append msg(%i) to storage****\n", msg->mid);
-		DL_APPEND(msg_data->storage, msg);
+		//20230410這裡的設計是為了讓storage不塞爆，塞爆就把所有東西吐出來
+		// struct mosquitto_client_msg *elt;
+		// int count_storage;					
+		// DL_COUNT(context->msgs_out.storage, elt, count_storage);
+		// if(count_storage> 500){				
+		// 	db__message_write_storage_out(mosq);
+		// }
+		DL_APPEND(msg_data->storage, msg);	//20230116把訊息append到storage裡暫存
 	}else{
 		printf("****append msg(%i) to inflight****\n", msg->mid);
 		DL_APPEND(msg_data->inflight, msg);
@@ -1264,7 +1271,6 @@ int db__message_write_storage_out(struct mosquitto *context)
 	struct mosquitto_client_msg *tail, *tmp, *elt;	//20230316 Changes後面用到DL_COUNT跟DL_FOREACH_SAFE需要的
 	DL_COUNT(context->msgs_out.storage, elt, count);		//20230316 Changees 為了計算storage裡有幾個message，可以拿掉，對功能來說沒有用處，Debug用
 	printf("#storage: %d\n",count);
-	
 
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;

@@ -61,7 +61,7 @@ Contributors:
 
 int mosquitto__check_keepalive(struct mosquitto *mosq)
 {
-	printf("mosquitto__check_keepalive");
+	// printf("mosquitto__check_keepalive");
 	time_t next_msg_out;
 	time_t last_msg_in;
 	time_t now;
