@@ -538,3 +538,4 @@ void *mosquitto_userdata(struct mosquitto *mosq)
 {
 	return mosq->userdata;
 }
+

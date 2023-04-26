@@ -434,6 +434,7 @@ int handle__connect(struct mosquitto *context)
 	void *auth_data_out = NULL;
 	uint16_t auth_data_out_len = 0;
 	bool allow_zero_length_clientid;
+	int client_threshold_l=0; //20230426
 #ifdef WITH_TLS
 	int i;
 	X509 *client_cert = NULL;

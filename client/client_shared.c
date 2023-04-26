@@ -37,6 +37,7 @@ Contributors:
 #include <mosquitto.h>
 #include <mqtt_protocol.h>
 #include "client_shared.h"
+// #include "lib/mosquitto_internal.h" //20230426
 
 #ifdef WITH_SOCKS
 static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url);
@@ -195,6 +196,12 @@ static void init_config(struct mosq_config *cfg, int pub_or_sub)
 	cfg->repeat_delay.tv_sec = 0;
 	cfg->repeat_delay.tv_usec = 0;
 	cfg->random_filter = 10000;
+	//20230417 fixed-me-here
+	if(pub_or_sub == CLIENT_SUB){
+		cfg->threshold_l=1;		//20230412 threshold_l for every client
+	}else{
+		cfg->threshold_l=-1;
+	}
 	if(pub_or_sub == CLIENT_RR){
 		cfg->protocol_version = MQTT_PROTOCOL_V5;
 		cfg->msg_count = 1;
@@ -441,6 +448,10 @@ int client_config_load(struct mosq_config *cfg, int pub_or_sub, int argc, char *
 			fprintf(stderr, "Error: You must specify a topic to subscribe to.\n");
 			return 1;
 		}
+	}
+
+	if(pub_or_sub == CLIENT_PUB){		//20230417
+		cfg->threshold_l=-1;
 	}
 
 	if(!cfg->host){
@@ -915,6 +926,20 @@ int client_config_line_proc(struct mosq_config *cfg, int pub_or_sub, int argc, c
 				}
 			}
 			i++;
+		}else if(!strcmp(argv[i], "--threshold_l")){		//20230412 config set for threshold_l for every client
+			if(pub_or_sub != CLIENT_SUB){
+				goto unknown_option;
+			}else if(i==argc-1){
+				fprintf(stderr, "Error: --threshold_l argument given but no threshold_l specified.\n\n");
+				return 1;
+			}else{
+				if(atoi(argv[i+1])<0){
+					fprintf(stderr, "Error: --threshold_l should be positive.\n\n");
+					return 1;
+				}	
+				cfg->threshold_l = atoi(argv[i+1]);
+			}
+			i++;
 		}else if(!strcmp(argv[i], "--quiet")){
 			cfg->quiet = true;
 		}else if(!strcmp(argv[i], "-r") || !strcmp(argv[i], "--retain")){
@@ -1240,7 +1265,6 @@ int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg)
 #if defined(WITH_TLS) || defined(WITH_SOCKS)
 	int rc;
 #endif
-
 	mosquitto_int_option(mosq, MOSQ_OPT_PROTOCOL_VERSION, cfg->protocol_version);
 
 	if(cfg->will_topic && mosquitto_will_set_v5(mosq, cfg->will_topic,
@@ -1252,12 +1276,12 @@ int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg)
 		return 1;
 	}
 	cfg->will_props = NULL;
-
 	if((cfg->username || cfg->password) && mosquitto_username_pw_set(mosq, cfg->username, cfg->password)){
 		err_printf(cfg, "Error: Problem setting username and/or password.\n");
 		mosquitto_lib_cleanup();
 		return 1;
 	}
+	else
 #ifdef WITH_TLS
 	if(cfg->cafile || cfg->capath){
 		rc = mosquitto_tls_set(mosq, cfg->cafile, cfg->capath, cfg->certfile, cfg->keyfile, NULL);
@@ -1355,6 +1379,7 @@ int client_id_generate(struct mosq_config *cfg)
 
 int client_connect(struct mosquitto *mosq, struct mosq_config *cfg)
 {
+	// printf("client_connect\n");		//20230418這裡會進來
 #ifndef WIN32
 	char *err;
 #else

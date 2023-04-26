@@ -115,6 +115,7 @@ struct mosq_config {
 	int sub_opts; /* sub */
 	long session_expiry_interval;
 	int random_filter; /* sub */
+	int threshold_l;	/*sub*/ //20230412 threshold_l for every client (subscriber)
 #ifdef WITH_SOCKS
 	char *socks5_host;
 	int socks5_port;

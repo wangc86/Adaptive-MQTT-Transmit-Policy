@@ -1,0 +1,5 @@
+Error: The connection was lost.
+iven but no time specified.
+
+
+Use 'mosquitto_pub --help' to see usage.

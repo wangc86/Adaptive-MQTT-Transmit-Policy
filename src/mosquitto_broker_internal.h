@@ -314,7 +314,7 @@ struct mosquitto__config {
 	struct mosquitto__security_options security_options;
 	//20230209
 	size_t threshold_s;	//20230209Changes threshold for packet size,0321型態從int改為size_t
-	int threshold_l;	//20230330 Changes
+	// int threshold_l;	//20230330 Changes
 };
 
 
@@ -406,6 +406,7 @@ struct mosquitto_client_msg{
 	enum mosquitto_msg_direction direction;
 	enum mosquitto_msg_state state;
 	bool dup;
+	struct timespec storage_time;		//20230418 timestamp for the msg(storage_time)
 };
 
 

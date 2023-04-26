@@ -156,6 +156,7 @@ int mosquitto_reinitialise(struct mosquitto *mosq, const char *id, bool clean_st
 	mosq->protocol = mosq_p_mqtt311;
 	mosq->sock = INVALID_SOCKET;
 	mosq->keepalive = 60;
+	mosq->threshold_l=300;		//20230412 fixed-me
 	mosq->clean_start = clean_start;
 	if(id){
 		if(STREMPTY(id)){
