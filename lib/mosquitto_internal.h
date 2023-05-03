@@ -258,7 +258,7 @@ struct mosquitto
 	//  time_t next_test;
 	struct timespec latency_t;		//20230330
 	struct timespec send_time;		//20230330
-	int threshold_l;				//20230412 Set the threshold_l for every client(單位: ms)
+	uint16_t threshold_l;				//20230412 Set the threshold_l for every client(單位: ms)
 	// time_t latency_t;			//20230321 Changes test latency
 	// time_t send_lat_t;			//20230321 Changes the time that send latency.
 	enum transfer_mode mode; 	// 20230320 Changes 加上transfer mode： 0為normal mode, 1為slow mode,還沒初始化

@@ -114,13 +114,12 @@ static void my_message_callback(struct mosquitto *mosq, void *obj, const struct 
 static void my_connect_callback(struct mosquitto *mosq, void *obj, int result, int flags, const mosquitto_property *properties)
 {
 	int i;
-
+	// printf("my_connect_callback\n");	//20230503會進這裡
 	UNUSED(obj);
 	UNUSED(flags);
 	UNUSED(properties);
 
 	connack_received = true;
-
 	connack_result = result;
 	if(!result){
 		mosquitto_subscribe_multiple(mosq, NULL, cfg.topic_count, cfg.topics, cfg.qos, cfg.sub_opts, cfg.subscribe_props);
@@ -173,7 +172,7 @@ static void my_log_callback(struct mosquitto *mosq, void *obj, int level, const 
 	UNUSED(mosq);
 	UNUSED(obj);
 	UNUSED(level);
-
+	
 	printf("%s\n", str);
 }
 

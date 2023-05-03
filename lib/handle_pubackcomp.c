@@ -140,12 +140,12 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 		//20230330判斷大於threshold_l的話切換成slow_mode
 		if(tmp_lat>=mosq->threshold_l && (mosquitto__get_mode(mosq)==normal_mode)){
 			mosquitto__set_mode(mosq, slow_mode);
-			printf("Mode Change...\n");
+			printf("Mode Change...to slow_mode\n");
 			mosq->slow_mode_times=1;
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <slow_mode>", mosq->id);
 		}else if(tmp_lat<mosq->threshold_l && (mosquitto__get_mode(mosq)==slow_mode)){
 			mosquitto__set_mode(mosq, normal_mode);
-			printf("Mode Change...\n");
+			printf("Mode Change...to normal_mode\n");
 			mosq->slow_mode_times=0;
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <normal_mode>", mosq->id);
 		}
@@ -163,7 +163,7 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 			log__printf(NULL, MOSQ_LOG_DEBUG, "%s : <normal_mode>\n", mosq->id);
 		}
 			
-		printf("Check out the msg in storage which need to append to inflight....\n");
+		// printf("Check out the msg in storage which need to append to inflight....\n");
 		rc = db__message_write_storage_out(mosq);
 		if(rc) return rc;	
 		mosq->send_time.tv_sec=0;

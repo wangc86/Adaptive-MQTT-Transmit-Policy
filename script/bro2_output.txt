@@ -1,54 +1,140 @@
-2023-04-26T16:18:47: mosquitto version 2.0.12 starting
-2023-04-26T16:18:47: Config loaded from ./mosquitto.conf.
-2023-04-26T16:18:47: Opening ipv4 listen socket on port 1884.
-2023-04-26T16:18:47: Opening ipv6 listen socket on port 1884.
-2023-04-26T16:18:47: mosquitto version 2.0.12 running
-2023-04-26T16:18:47: create the timer...............
+2023-05-03T14:49:51: mosquitto version 2.0.12 starting
+2023-05-03T14:49:51: Config loaded from ./mosquitto.conf.
+2023-05-03T14:49:51: Opening ipv4 listen socket on port 1884.
+2023-05-03T14:49:51: Opening ipv6 listen socket on port 1884.
+2023-05-03T14:49:51: mosquitto version 2.0.12 running
+2023-05-03T14:49:51: create the timer...............
 
 
-2023-04-26T16:18:48: New connection from 127.0.0.1:43870 on port 1884.
-2023-04-26T16:18:48: New client connected from 127.0.0.1:43870 as <Sub1> (p2, c1, k60).
-2023-04-26T16:18:48: No will message specified.
-2023-04-26T16:18:48: Sending CONNACK to <Sub1> (0, 0)
-2023-04-26T16:18:48: Received SUBSCRIBE from <Sub1>
-2023-04-26T16:18:48: 	test (QoS 1)
-2023-04-26T16:18:48: <Sub1> 1 test
-2023-04-26T16:18:48: 	latency (QoS 1)
-2023-04-26T16:18:48: <Sub1> 1 latency
-2023-04-26T16:18:48: Sending SUBACK to <Sub1>
-2023-04-26T16:18:51: New connection from 127.0.0.1:43876 on port 1884.
-2023-04-26T16:18:51: New client connected from 127.0.0.1:43876 as <Pub_Lat(QoS=1)> (p2, c1, k60).
-2023-04-26T16:18:51: No will message specified.
-2023-04-26T16:18:51: Sending CONNACK to <Pub_Lat(QoS=1)> (0, 0)
-2023-04-26T16:18:51: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m1, 'latency', ... (28 bytes))
-2023-04-26T16:18:51: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m1, '(null)', ... (28 bytes))
-2023-04-26T16:18:51: Sending PUBACK to <Pub_Lat(QoS=1)> (m1, rc0)
-<Sub1> latency: 66
-2023-04-26T16:18:51: <Sub1> : <normal_mode>
+2023-05-03T14:49:52: New connection from 127.0.0.1:50596 on port 1884.
+2023-05-03T14:49:52: New client connected from 127.0.0.1:50596 as <Sub1> (p2, c1, k60).
+2023-05-03T14:49:52: No will message specified.
+2023-05-03T14:49:52: Sending CONNACK to <Sub1> (0, 0)
+2023-05-03T14:49:52: Received SUBSCRIBE from <Sub1>
+2023-05-03T14:49:52: 	test (QoS 1)
+2023-05-03T14:49:52: <Sub1> 1 test
+2023-05-03T14:49:52: 	latency (QoS 1)
+2023-05-03T14:49:52: <Sub1> 1 latency
+2023-05-03T14:49:52: Sending SUBACK to <Sub1>
+2023-05-03T14:49:55: New connection from 127.0.0.1:50610 on port 1884.
+2023-05-03T14:49:55: New client connected from 127.0.0.1:50610 as <Pub_Lat(QoS=1)> (p2, c1, k60).
+2023-05-03T14:49:55: No will message specified.
+2023-05-03T14:49:55: Sending CONNACK to <Pub_Lat(QoS=1)> (0, 0)
+2023-05-03T14:49:55: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m1, 'latency', ... (28 bytes))
+2023-05-03T14:49:55: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m1, '(null)', ... (28 bytes))
+2023-05-03T14:49:55: Sending PUBACK to <Pub_Lat(QoS=1)> (m1, rc0)
+<Sub1> latency: 235
+2023-05-03T14:49:55: <Sub1> : <slow_mode>
 
-2023-04-26T16:18:51: Received PUBACK from <Sub1> (Mid: 1, RC:0)
-2023-04-26T16:18:54: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m2, 'latency', ... (28 bytes))
-2023-04-26T16:18:54: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m2, '(null)', ... (28 bytes))
-2023-04-26T16:18:54: Sending PUBACK to <Pub_Lat(QoS=1)> (m2, rc0)
-<Sub1> latency: 346
-2023-04-26T16:18:54: <Sub1> : <slow_mode>
+2023-05-03T14:49:55: Received PUBACK from <Sub1> (Mid: 1, RC:0)
+2023-05-03T14:50:00: New connection from 127.0.0.1:43992 on port 1884.
+2023-05-03T14:50:00: New client connected from 127.0.0.1:43992 as <Pub_L> (p2, c1, k60).
+2023-05-03T14:50:00: No will message specified.
+2023-05-03T14:50:00: Sending CONNACK to <Pub_L> (0, 0)
+2023-05-03T14:50:00: Received PUBLISH from <Pub_L> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:00: Sending PUBACK to <Pub_L> (m1, rc0)
+2023-05-03T14:50:00: Received DISCONNECT from <Pub_L>
+2023-05-03T14:50:00: Client <Pub_L> disconnected.
+2023-05-03T14:50:00: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m2, 'latency', ... (28 bytes))
+2023-05-03T14:50:00: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m3, '(null)', ... (28 bytes))
+2023-05-03T14:50:00: Sending PUBACK to <Pub_Lat(QoS=1)> (m2, rc0)
+<Sub1> latency: 241
+2023-05-03T14:50:00: <Sub1> : <slow_mode>
 
-2023-04-26T16:18:54: Received PUBACK from <Sub1> (Mid: 2, RC:0)
-2023-04-26T16:18:56: New connection from 127.0.0.1:43890 on port 1884.
-2023-04-26T16:18:56: New client connected from 127.0.0.1:43890 as <Pub_S> (p2, c1, k60).
-2023-04-26T16:18:56: No will message specified.
-2023-04-26T16:18:56: Sending CONNACK to <Pub_S> (0, 0)
-2023-04-26T16:18:56: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
-2023-04-26T16:18:56: Sending PUBACK to <Pub_S> (m1, rc0)
-2023-04-26T16:18:57: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m3, 'latency', ... (28 bytes))
-2023-04-26T16:18:57: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m4, '(null)', ... (28 bytes))
-2023-04-26T16:18:57: Sending PUBACK to <Pub_Lat(QoS=1)> (m3, rc0)
-<Sub1> latency: 198
-2023-04-26T16:18:57: <Sub1> : <normal_mode>
+2023-05-03T14:50:00: Received PUBACK from <Sub1> (Mid: 3, RC:0)
+2023-05-03T14:50:02: New connection from 127.0.0.1:43996 on port 1884.
+2023-05-03T14:50:02: New client connected from 127.0.0.1:43996 as <Pub_S> (p2, c1, k60).
+2023-05-03T14:50:02: No will message specified.
+2023-05-03T14:50:02: Sending CONNACK to <Pub_S> (0, 0)
+2023-05-03T14:50:02: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:02: Sending PUBACK to <Pub_S> (m1, rc0)
+2023-05-03T14:50:02: Received DISCONNECT from <Pub_S>
+2023-05-03T14:50:02: Client <Pub_S> disconnected.
+2023-05-03T14:50:04: New connection from 127.0.0.1:44006 on port 1884.
+2023-05-03T14:50:04: New client connected from 127.0.0.1:44006 as <Pub_L> (p2, c1, k60).
+2023-05-03T14:50:04: No will message specified.
+2023-05-03T14:50:04: Sending CONNACK to <Pub_L> (0, 0)
+2023-05-03T14:50:04: Received PUBLISH from <Pub_L> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:04: Sending PUBACK to <Pub_L> (m1, rc0)
+2023-05-03T14:50:04: Received DISCONNECT from <Pub_L>
+2023-05-03T14:50:04: Client <Pub_L> disconnected.
+2023-05-03T14:50:05: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m3, 'latency', ... (28 bytes))
+2023-05-03T14:50:05: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m6, '(null)', ... (28 bytes))
+2023-05-03T14:50:05: Sending PUBACK to <Pub_Lat(QoS=1)> (m3, rc0)
+<Sub1> latency: 257
+2023-05-03T14:50:05: <Sub1> : <slow_mode>
 
-2023-04-26T16:18:57: Received PUBACK from <Sub1> (Mid: 4, RC:0)
-2023-04-26T16:18:57: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m3, '(null)', ... (46 bytes))
-2023-04-26T16:18:57: Received PUBACK from <Sub1> (Mid: 3, RC:0)
-2023-04-26T16:18:58: Received DISCONNECT from <Sub1>
-2023-04-26T16:18:58: Client <Sub1> disconnected.
-2023-04-26T16:18:58: mosquitto version 2.0.12 terminating
+2023-05-03T14:50:05: Received PUBACK from <Sub1> (Mid: 6, RC:0)
+2023-05-03T14:50:06: New connection from 127.0.0.1:44020 on port 1884.
+2023-05-03T14:50:06: New client connected from 127.0.0.1:44020 as <Pub_S> (p2, c1, k60).
+2023-05-03T14:50:06: No will message specified.
+2023-05-03T14:50:06: Sending CONNACK to <Pub_S> (0, 0)
+2023-05-03T14:50:06: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:06: Sending PUBACK to <Pub_S> (m1, rc0)
+2023-05-03T14:50:06: Received DISCONNECT from <Pub_S>
+2023-05-03T14:50:06: Client <Pub_S> disconnected.
+2023-05-03T14:50:08: New connection from 127.0.0.1:33388 on port 1884.
+2023-05-03T14:50:08: New client connected from 127.0.0.1:33388 as <Pub_L> (p2, c1, k60).
+2023-05-03T14:50:08: No will message specified.
+2023-05-03T14:50:08: Sending CONNACK to <Pub_L> (0, 0)
+2023-05-03T14:50:08: Received PUBLISH from <Pub_L> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:08: Sending PUBACK to <Pub_L> (m1, rc0)
+2023-05-03T14:50:08: Received DISCONNECT from <Pub_L>
+2023-05-03T14:50:08: Client <Pub_L> disconnected.
+2023-05-03T14:50:10: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m4, 'latency', ... (28 bytes))
+2023-05-03T14:50:10: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m9, '(null)', ... (28 bytes))
+2023-05-03T14:50:10: Sending PUBACK to <Pub_Lat(QoS=1)> (m4, rc0)
+<Sub1> latency: 241
+2023-05-03T14:50:10: <Sub1> : <slow_mode>
+
+2023-05-03T14:50:10: Received PUBACK from <Sub1> (Mid: 9, RC:0)
+2023-05-03T14:50:10: New connection from 127.0.0.1:33400 on port 1884.
+2023-05-03T14:50:10: New client connected from 127.0.0.1:33400 as <Pub_S> (p2, c1, k60).
+2023-05-03T14:50:10: No will message specified.
+2023-05-03T14:50:10: Sending CONNACK to <Pub_S> (0, 0)
+2023-05-03T14:50:10: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:10: Sending PUBACK to <Pub_S> (m1, rc0)
+2023-05-03T14:50:10: Received DISCONNECT from <Pub_S>
+2023-05-03T14:50:10: Client <Pub_S> disconnected.
+2023-05-03T14:50:12: New connection from 127.0.0.1:33412 on port 1884.
+2023-05-03T14:50:12: New client connected from 127.0.0.1:33412 as <Pub_L> (p2, c1, k60).
+2023-05-03T14:50:12: No will message specified.
+2023-05-03T14:50:12: Sending CONNACK to <Pub_L> (0, 0)
+2023-05-03T14:50:12: Received PUBLISH from <Pub_L> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:12: Sending PUBACK to <Pub_L> (m1, rc0)
+2023-05-03T14:50:12: Received DISCONNECT from <Pub_L>
+2023-05-03T14:50:12: Client <Pub_L> disconnected.
+2023-05-03T14:50:14: New connection from 127.0.0.1:33422 on port 1884.
+2023-05-03T14:50:14: New client connected from 127.0.0.1:33422 as <Pub_S> (p2, c1, k60).
+2023-05-03T14:50:14: No will message specified.
+2023-05-03T14:50:14: Sending CONNACK to <Pub_S> (0, 0)
+2023-05-03T14:50:14: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:14: Sending PUBACK to <Pub_S> (m1, rc0)
+2023-05-03T14:50:14: Received DISCONNECT from <Pub_S>
+2023-05-03T14:50:14: Client <Pub_S> disconnected.
+2023-05-03T14:50:15: Received PUBLISH from <Pub_Lat(QoS=1)> (d0, q1, r0, m5, 'latency', ... (28 bytes))
+2023-05-03T14:50:15: Sending PUBLISH to <Sub1> 127.0.0.1 (d0, q1, r0, m13, '(null)', ... (28 bytes))
+2023-05-03T14:50:15: Sending PUBACK to <Pub_Lat(QoS=1)> (m5, rc0)
+<Sub1> latency: 292
+2023-05-03T14:50:15: <Sub1> : <slow_mode>
+
+2023-05-03T14:50:15: Received PUBACK from <Sub1> (Mid: 13, RC:0)
+2023-05-03T14:50:16: New connection from 127.0.0.1:33424 on port 1884.
+2023-05-03T14:50:16: New client connected from 127.0.0.1:33424 as <Pub_L> (p2, c1, k60).
+2023-05-03T14:50:16: No will message specified.
+2023-05-03T14:50:16: Sending CONNACK to <Pub_L> (0, 0)
+2023-05-03T14:50:16: Received PUBLISH from <Pub_L> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:16: Sending PUBACK to <Pub_L> (m1, rc0)
+2023-05-03T14:50:16: Received DISCONNECT from <Pub_L>
+2023-05-03T14:50:16: Client <Pub_L> disconnected.
+2023-05-03T14:50:18: New connection from 127.0.0.1:38658 on port 1884.
+2023-05-03T14:50:18: New client connected from 127.0.0.1:38658 as <Pub_S> (p2, c1, k60).
+2023-05-03T14:50:18: No will message specified.
+2023-05-03T14:50:18: Sending CONNACK to <Pub_S> (0, 0)
+2023-05-03T14:50:18: Received PUBLISH from <Pub_S> (d0, q1, r0, m1, 'test', ... (46 bytes))
+2023-05-03T14:50:18: Sending PUBACK to <Pub_S> (m1, rc0)
+2023-05-03T14:50:18: Received DISCONNECT from <Pub_S>
+2023-05-03T14:50:18: Client <Pub_S> disconnected.
+2023-05-03T14:50:18: Received DISCONNECT from <Sub1>
+2023-05-03T14:50:18: Client <Sub1> disconnected.
+2023-05-03T14:50:18: mosquitto version 2.0.12 terminating

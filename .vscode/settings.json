@@ -18,6 +18,10 @@
         "optional": "c",
         "new": "c",
         "streambuf": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "array": "c",
+        "istream": "c",
+        "ostream": "c",
+        "tuple": "c"
     }
 }

@@ -37,7 +37,7 @@ Contributors:
 #include <mosquitto.h>
 #include <mqtt_protocol.h>
 #include "client_shared.h"
-// #include "lib/mosquitto_internal.h" //20230426
+#include "lib/mosquitto_internal.h" //20230426 //20230427
 
 #ifdef WITH_SOCKS
 static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url);
@@ -200,7 +200,7 @@ static void init_config(struct mosq_config *cfg, int pub_or_sub)
 	if(pub_or_sub == CLIENT_SUB){
 		cfg->threshold_l=1;		//20230412 threshold_l for every client
 	}else{
-		cfg->threshold_l=-1;
+		cfg->threshold_l=0;
 	}
 	if(pub_or_sub == CLIENT_RR){
 		cfg->protocol_version = MQTT_PROTOCOL_V5;
@@ -450,9 +450,9 @@ int client_config_load(struct mosq_config *cfg, int pub_or_sub, int argc, char *
 		}
 	}
 
-	if(pub_or_sub == CLIENT_PUB){		//20230417
-		cfg->threshold_l=-1;
-	}
+	// if(pub_or_sub == CLIENT_PUB){		//20230417
+	// 	cfg->threshold_l=-1;
+	// }
 
 	if(!cfg->host){
 		cfg->host = strdup("localhost");
@@ -1266,7 +1266,7 @@ int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg)
 	int rc;
 #endif
 	mosquitto_int_option(mosq, MOSQ_OPT_PROTOCOL_VERSION, cfg->protocol_version);
-
+	mosq->threshold_l=cfg->threshold_l;	//20230503把cfg讀到的threshold_l給mosq
 	if(cfg->will_topic && mosquitto_will_set_v5(mosq, cfg->will_topic,
 				cfg->will_payloadlen, cfg->will_payload, cfg->will_qos,
 				cfg->will_retain, cfg->will_props)){
@@ -1412,7 +1412,9 @@ int client_connect(struct mosquitto *mosq, struct mosq_config *cfg)
 		rc = mosquitto_connect_bind_v5(mosq, cfg->host, port, cfg->keepalive, cfg->bind_address, cfg->connect_props);
 	}
 #else
+	// printf("client_shared.c client_connect line 1415\n");
 	rc = mosquitto_connect_bind_v5(mosq, cfg->host, port, cfg->keepalive, cfg->bind_address, cfg->connect_props);
+
 #endif
 	if(rc>0){
 		if(rc == MOSQ_ERR_ERRNO){

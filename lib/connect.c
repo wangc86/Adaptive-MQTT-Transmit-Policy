@@ -93,7 +93,8 @@ int mosquitto_connect_bind(struct mosquitto *mosq, const char *host, int port, i
 }
 // int mosquitto_connect_bind_v5(struct mosquitto *mosq, const char *host, int port, int keepalive, const char *bind_address, const mosquitto_property *properties)
 int mosquitto_connect_bind_v5(struct mosquitto *mosq, const char *host, int port, int keepalive, const char *bind_address, const mosquitto_property *properties)
-{
+{	
+	// printf("mosquitto_connect_bind_v5\n");	//會進這裡 (他是non-blocking function)
 	int rc;
 
 	if(bind_address){

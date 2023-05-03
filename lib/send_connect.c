@@ -36,6 +36,7 @@ Contributors:
 
 int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session, const mosquitto_property *properties)
 {
+	// printf("\nsend__connect\n\n");
 	struct mosquitto__packet *packet = NULL;
 	uint32_t payloadlen;
 	uint8_t will = 0;
@@ -47,6 +48,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	uint32_t proplen = 0, varbytes;
 	mosquitto_property *local_props = NULL;
 	uint16_t receive_maximum;
+	uint16_t threshold_l; //20230427 threshold_l in CONNECT packet
 
 	assert(mosq);
 
@@ -66,6 +68,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	clientid = mosq->id;
 	username = mosq->username;
 	password = mosq->password;
+	threshold_l=mosq->threshold_l; //20230427 threshold_l
 #endif
 
 	if(mosq->protocol == mosq_p_mqtt5){
@@ -133,6 +136,9 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	if(password){
 		payloadlen += (uint32_t)(2+strlen(password));
 	}
+	if(threshold_l>0){
+		payloadlen += (uint16_t)(2);		//20230427 threshold_l 預設最大六位
+	}
 
 	packet->command = CMD_CONNECT;
 	packet->remaining_length = headerlen + payloadlen;
@@ -168,6 +174,11 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	if(mosq->password){
 		byte = byte | 0x1<<6;
 	}
+	// 20230427 借用CONNECT flags Bit 0 參考MQTT-v5 Standards
+	if(threshold_l>0){
+		byte = byte | 0x1<<0;
+	}
+
 	packet__write_byte(packet, byte);
 	packet__write_uint16(packet, keepalive);
 
@@ -200,6 +211,12 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	if(password){
 		packet__write_string(packet, password, (uint16_t)strlen(password));
 	}
+	// printf("payload: %s\n",packet->payload);
+
+	//20230427 在CONNECT封包中加入threshold_l
+	if(threshold_l>0){
+		packet__write_uint16(packet, threshold_l);
+	}
 
 	mosq->keepalive = keepalive;
 #ifdef WITH_BROKER
@@ -207,6 +224,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	log__printf(mosq, MOSQ_LOG_DEBUG, "Bridge %s sending CONNECT", clientid);
 # endif
 #else
+	// log__printf(mosq, MOSQ_LOG_DEBUG, "Client %s sending payload(threshold_l): %s", clientid,packet->payload);
 	log__printf(mosq, MOSQ_LOG_DEBUG, "Client %s sending CONNECT", clientid);
 #endif
 	return packet__queue(mosq, packet);

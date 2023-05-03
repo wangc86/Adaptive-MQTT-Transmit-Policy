@@ -468,10 +468,7 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 		//---20230112 Change 在這裡可以把message改為加入queue而不是加入inflight
 		printf("---stored->payloadlen---: %d\n\n",stored->payloadlen);
 		if(stored->payloadlen>db.config->threshold_s && context->mode==slow_mode && strcmp(stored->topic,"latency")){		//20230209 db.config->threshold_s ,20230321 Changes 加入mode條件
-			// if (db__ready_for_queue(context, qos, msg_data)){
-			// 	state = mosq_ms_queued;
-			// }
-			printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
+			// printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
 			state = mosq_ms_storage;		//20230116把qos=1的message狀態改為mosq_ms_storage
 		}//20230112 Change----
 		// if(db__ready_for_flight(context, dir, qos)){	  //20230112 Ori----

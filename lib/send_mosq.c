@@ -43,6 +43,7 @@ Contributors:
 
 int send__pingreq(struct mosquitto *mosq)
 {
+	printf("send__pingreq\n");
 	int rc;
 	assert(mosq);
 #ifdef WITH_BROKER
