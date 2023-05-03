@@ -48,6 +48,8 @@ struct mosquitto *context__init(mosq_sock_t sock)
 	mosquitto__set_state(context, mosq_cs_new);
 	mosquitto__set_mode(context, slow_mode);	//20230321 Changes 當context初始化時也要初始化mode(init為normal mode)
 	context->send_time.tv_sec=0;						//20230406 Changes 初始化send_time
+	context->slow_mode_times=0;							//20230410 Changes 初始化slow_mode_times
+	context->threshold_l=0;				//20230412 Changes 初始化threshold_l fixed-me-here 這裡可以設定threshold_l
 	context->sock = sock;
 	context->last_msg_in = db.now_s;
 	context->next_msg_out = db.now_s + 60;

@@ -434,6 +434,7 @@ int handle__connect(struct mosquitto *context)
 	void *auth_data_out = NULL;
 	uint16_t auth_data_out_len = 0;
 	bool allow_zero_length_clientid;
+	// int client_threshold_l=0; //20230426
 #ifdef WITH_TLS
 	int i;
 	X509 *client_cert = NULL;
@@ -528,19 +529,22 @@ int handle__connect(struct mosquitto *context)
 		rc = MOSQ_ERR_PROTOCOL;
 		goto handle_connect_error;
 	}
-
 	if(packet__read_byte(&context->in_packet, &connect_flags)){
 		rc = MOSQ_ERR_PROTOCOL;
 		goto handle_connect_error;
 	}
 	if(context->protocol == mosq_p_mqtt311 || context->protocol == mosq_p_mqtt5){
-		if((connect_flags & 0x01) != 0x00){
+		if((connect_flags & 0x00) != 0x00){			//20230501 reversed bit被改成threshold_l
+		// if((connect_flags & 0x01) != 0x00){
+			printf("%d %s\n", __LINE__, __FILE__);
 			rc = MOSQ_ERR_PROTOCOL;
 			goto handle_connect_error;
 		}
 	}
-
+	// printf("connect_flags: %d\n",connect_flags);
 	clean_start = (connect_flags & 0x02) >> 1;
+	uint8_t threshold_l_flag=(connect_flags & 0x01);		//20230501
+	printf("connect_flags_threshold_l: %d\n",threshold_l_flag);		//20230501
 	/* session_expiry_interval will be overriden if the properties are read later */
 	if(clean_start == false && protocol_version != PROTOCOL_VERSION_v5){
 		/* v3* has clean_start == false mean the session never expires */
@@ -559,7 +563,7 @@ int handle__connect(struct mosquitto *context)
 	will_retain = ((connect_flags & 0x20) == 0x20);
 	password_flag = connect_flags & 0x40;
 	username_flag = connect_flags & 0x80;
-
+	
 	if(will && will_retain && db.config->retain_available == false){
 		if(protocol_version == mosq_p_mqtt5){
 			send__connack(context, 0, MQTT_RC_RETAIN_NOT_SUPPORTED, NULL);
@@ -592,7 +596,7 @@ int handle__connect(struct mosquitto *context)
 	}
 
 	mosquitto_property_free_all(&properties); /* FIXME - TEMPORARY UNTIL PROPERTIES PROCESSED */
-
+	
 	if(packet__read_string(&context->in_packet, &client_id, &slen)){
 		rc = MOSQ_ERR_PROTOCOL;
 		goto handle_connect_error;
@@ -634,7 +638,7 @@ int handle__connect(struct mosquitto *context)
 			}
 		}
 	}
-
+	
 	/* clientid_prefixes check */
 	if(db.config->clientid_prefixes){
 		if(strncmp(db.config->clientid_prefixes, client_id, strlen(db.config->clientid_prefixes))){
@@ -698,13 +702,35 @@ int handle__connect(struct mosquitto *context)
 			}
 		}
 	}
-
+	//20230427 threshold_l
+	// if(threshold_l_flag){
+	// 	rc = packet__read_uint16(&context->in_packet, &(context->threshold_l));
+	// 	if(rc == MOSQ_ERR_NOMEM){
+	// 		rc = MOSQ_ERR_NOMEM;
+	// 		goto handle_connect_error;
+	// 	}else if(rc == MOSQ_ERR_MALFORMED_PACKET){
+	// 		if(context->protocol == mosq_p_mqtt31){
+	// 			/* threshold_l_flag given, but no threshold_l_flag. Ignore. */
+	// 		}else{
+	// 			rc = MOSQ_ERR_PROTOCOL;
+	// 			goto handle_connect_error;
+	// 		}
+	// 	}
+	// }
+	if(threshold_l_flag){		//20230503
+		if(packet__read_uint16(&context->in_packet, &(context->threshold_l))){
+			rc = MOSQ_ERR_PROTOCOL;
+			goto handle_connect_error;
+		}
+	}
+	
+	
 	if(context->in_packet.pos != context->in_packet.remaining_length){
 		/* Surplus data at end of packet, this must be an error. */
 		rc = MOSQ_ERR_PROTOCOL;
 		goto handle_connect_error;
 	}
-
+	printf("context->threshold_l: %d\n",context->threshold_l);
 	/* Once context->id is set, if we return from this function with an error
 	 * we must make sure that context->id is freed and set to NULL, so that the
 	 * client isn't erroneously removed from the by_id hash table. */

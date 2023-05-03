@@ -18,7 +18,7 @@ Version 2.0.5 of Mosquitto has been released. This is a bugfix release.
   Closes [#1977].
 - Fix bridge connection not relinquishing POLLOUT after messages are sent.
   Closes [#1979].
-- Fix apparmor incorrectly denying access to
+- Fix apparmor incorrectly denying aess to
   /var/lib/mosquitto/mosquitto.db.new. Closes [#1978].
 - Fix potential intermittent initial bridge connections when using poll().
 - Fix `bind_interface` option. Closes [#1999].

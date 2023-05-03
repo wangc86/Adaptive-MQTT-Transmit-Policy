@@ -468,10 +468,7 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 		//---20230112 Change 在這裡可以把message改為加入queue而不是加入inflight
 		printf("---stored->payloadlen---: %d\n\n",stored->payloadlen);
 		if(stored->payloadlen>db.config->threshold_s && context->mode==slow_mode && strcmp(stored->topic,"latency")){		//20230209 db.config->threshold_s ,20230321 Changes 加入mode條件
-			// if (db__ready_for_queue(context, qos, msg_data)){
-			// 	state = mosq_ms_queued;
-			// }
-			printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
+			// printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
 			state = mosq_ms_storage;		//20230116把qos=1的message狀態改為mosq_ms_storage
 		}//20230112 Change----
 		// if(db__ready_for_flight(context, dir, qos)){	  //20230112 Ori----
@@ -565,6 +562,14 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 		// if(count_storage> 500){				
 		// 	db__message_write_storage_out(mosq);
 		// }
+		struct timespec tp;
+		if(clock_gettime(CLOCK_MONOTONIC, &tp))
+		{
+			perror("client/pub_client.c: my_publsih");
+			exit(EXIT_FAILURE);
+		}
+		msg->storage_time.tv_sec = tp.tv_sec;		//20230418訊息存入storage的timestamp
+		msg->storage_time.tv_nsec = tp.tv_nsec;
 		DL_APPEND(msg_data->storage, msg);	//20230116把訊息append到storage裡暫存
 	}else{
 		printf("****append msg(%i) to inflight****\n", msg->mid);
@@ -1268,6 +1273,7 @@ int db__message_write_storage_out(struct mosquitto *context)
 	// printf("...db__message_write_storage_out...\n");
 	printf("CONTEXT_ID: %s\n", context->id);
 	int count=0;
+	int tail_c= 0;
 	struct mosquitto_client_msg *tail, *tmp, *elt;	//20230316 Changes後面用到DL_COUNT跟DL_FOREACH_SAFE需要的
 	DL_COUNT(context->msgs_out.storage, elt, count);		//20230316 Changees 為了計算storage裡有幾個message，可以拿掉，對功能來說沒有用處，Debug用
 	printf("#storage: %d\n",count);
@@ -1275,11 +1281,44 @@ int db__message_write_storage_out(struct mosquitto *context)
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;
 	}
+	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){		//20230418檢測目前的訊息有沒有超過deadline的（檢查第一封就好）
+		printf("timestamp: %ld\n",tail->storage_time.tv_sec);
+		struct timespec tp;						//20230418 Now time
+		if(clock_gettime(CLOCK_MONOTONIC, &tp))
+		{
+			perror("client/pub_client.c: my_publsih");
+			exit(EXIT_FAILURE);
+		}
+		if((tp.tv_sec-tail->storage_time.tv_sec)< 60){		//20230418 60為msg可以保留在storage中的時間(單位： 秒)
+			break;
+		}		
+
+		if(context->msgs_out.inflight_maximum != 0 && context->msgs_out.inflight_quota == 0){
+			break;
+		}
+		switch(tail->qos){
+			case 0:
+				tail->state = mosq_ms_publish_qos0;
+				break;
+			case 1:
+				tail->state = mosq_ms_publish_qos1;
+				break;
+			case 2:
+				tail->state = mosq_ms_publish_qos2;
+				break;
+		}
+		db__message_destorage_first(context, &context->msgs_out);		//20230116自己新增的function											
+		if(tail_c==0)
+			break;
+	}
+
 	if(context->mode!=normal_mode){					//20230321 Changes client不是normal_mode的話就不會destorage
+		
 		return MOSQ_ERR_SUCCESS;
 	}
 	
 	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){
+		printf("timestamp: %ld\n",tail->storage_time.tv_sec);
 		if(context->msgs_out.inflight_maximum != 0 && context->msgs_out.inflight_quota == 0){
 			break;
 		}
@@ -1295,9 +1334,7 @@ int db__message_write_storage_out(struct mosquitto *context)
 				break;
 		}
 		// if(mode==normal_mode){			//2023加上判斷現在是哪個mode
-		// 	printf("****Destorage****\n");
-			db__message_destorage_first(context, &context->msgs_out);		//20230116自己新增的function
-		// }													
+		db__message_destorage_first(context, &context->msgs_out);		//20230116自己新增的function											
 		
 	}
 	return MOSQ_ERR_SUCCESS;

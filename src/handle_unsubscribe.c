@@ -126,8 +126,12 @@ int handle__unsubscribe(struct mosquitto *context)
 				mosquitto__free(reason_codes);
 				return rc;
 		}
-
+		//20230503 sub 是要取消訂閱的topic name
 		log__printf(NULL, MOSQ_LOG_DEBUG, "\t%s", sub);
+		if(!strcmp(sub, "latency")){
+			mosquitto__set_mode(context, normal_mode);
+			printf("Unsubscribe latency, change the mode to normal\n");
+		}
 		if(allowed){
 			rc = sub__remove(context, sub, db.subs, &reason);
 		}else{

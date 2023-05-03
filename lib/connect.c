@@ -76,7 +76,7 @@ static int mosquitto__connect_init(struct mosquitto *mosq, const char *host, int
 	mosq->msgs_in.inflight_quota = mosq->msgs_in.inflight_maximum;
 	mosq->msgs_out.inflight_quota = mosq->msgs_out.inflight_maximum;
 	mosq->retain_available = 1;
-
+	
 	return MOSQ_ERR_SUCCESS;
 }
 
@@ -91,9 +91,10 @@ int mosquitto_connect_bind(struct mosquitto *mosq, const char *host, int port, i
 {
 	return mosquitto_connect_bind_v5(mosq, host, port, keepalive, bind_address, NULL);
 }
-
+// int mosquitto_connect_bind_v5(struct mosquitto *mosq, const char *host, int port, int keepalive, const char *bind_address, const mosquitto_property *properties)
 int mosquitto_connect_bind_v5(struct mosquitto *mosq, const char *host, int port, int keepalive, const char *bind_address, const mosquitto_property *properties)
-{
+{	
+	// printf("mosquitto_connect_bind_v5\n");	//會進這裡 (他是non-blocking function)
 	int rc;
 
 	if(bind_address){
@@ -115,7 +116,6 @@ int mosquitto_connect_bind_v5(struct mosquitto *mosq, const char *host, int port
 	if(rc) return rc;
 
 	mosquitto__set_state(mosq, mosq_cs_new);
-
 	return mosquitto__reconnect(mosq, true);
 }
 

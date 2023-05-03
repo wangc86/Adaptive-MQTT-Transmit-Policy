@@ -13,6 +13,15 @@
         "fstream": "c",
         "limits": "c",
         "sstream": "c",
-        "utility": "c"
+        "utility": "c",
+        "atomic": "c",
+        "optional": "c",
+        "new": "c",
+        "streambuf": "c",
+        "typeinfo": "c",
+        "array": "c",
+        "istream": "c",
+        "ostream": "c",
+        "tuple": "c"
     }
 }

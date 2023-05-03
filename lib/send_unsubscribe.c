@@ -43,7 +43,7 @@ int send__unsubscribe(struct mosquitto *mosq, int *mid, int topic_count, char *c
 	int rc;
 	int i;
 	size_t tlen;
-
+	printf("topic: %s\n", topic);
 	assert(mosq);
 	assert(topic);
 

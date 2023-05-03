@@ -263,6 +263,10 @@ int handle__publish(struct mosquitto *context)
 		db__msg_store_free(msg);
 		return rc;
 	}
+	if(!strcmp(msg->topic,"threshold_l")){		//20230427 Change 想用PUBLISH封包來放threshold_l，但效率應該是會偏差
+		printf("\nReceive threshold_l PUBLISH message\n");
+		printf("%s\n\n",msg->payload);
+	}
 
 	// printf("--header---: %d\n", context->in_packet.command);
 	// printf("--payload--: %p\n\n", msg->payload);
