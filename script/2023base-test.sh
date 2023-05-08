@@ -16,8 +16,8 @@ sleep 1
 
 echo "Starting the subscriber.."
 # ./client/mosquitto_sub -h $broker_host -p $port_num -i "<Sub>" -t $topic -q $QoS_s > script/sub_output.txt 2> script/sub_output2.txt&
-./client/mosquitto_sub -h $broker_host -p $port_num -i "<Sub1>" -t $topic -t "latency" -q $QoS_s --threshold_l "200" &
-sleep 3
+./client/mosquitto_sub -h $broker_host -p $port_num -i "<Sub1>" -t $topic -t "latency" -q $QoS_s --threshold_l "500" 2> script/sub_output2.txt > script/sub_output.txt&
+sleep 1
 
 echo "Starting the Latency Packet Sender(s).."
 ./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_Lat(QoS=1)>" -t "latency" -m "This is the latnecy packet!!" -q $QoS_p --repeat 20 --repeat-delay $lat_per &
@@ -27,9 +27,10 @@ sleep 5
 echo "Starting the publisher(s).."
 for((i=1;i<=30;i++))
 do
-./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_L>" -t $topic -m $large_msg -q $QoS_p 2> script/pub_output.txt&
+# ./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_L>" -t $topic -m "Helloooooooooooooooooooooooooooooooooooooooo!!" -q $QoS_p 2>> script/pub_output.txt&
 sleep 2
-./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_S>" -t $topic -m $large_msg -q $QoS_p 2> script/pub_output.txt&
+./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_S>" -t $topic -m "Habcdefgy" -q $QoS_p 2>> script/pub_output.txt&
+./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub_L_filw>" -t $topic -f "trans_file/100B.txt" -q $QoS_p 2>> script/pub_output.txt&
 sleep 2
 done
 
@@ -38,7 +39,6 @@ sleep 2
 # ./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub1(QoS=0)>" -t $topic -m "Hello QoS2!!" -q 0 --repeat $re --repeat-delay 0.5 > /dev/null &
 # ./client/mosquitto_pub -h $broker_host -p $port_num -i "<Pub>" -t $topic -f "1KB.txt" -q 1 &
 
-
 sleep 1
 
 read -p "Press any key to continue... " -n1 -s
@@ -46,5 +46,7 @@ read -p "Press any key to continue... " -n1 -s
 killall mosquitto_pub
 killall mosquitto_sub
 killall ./src/mosquitto
+
+mv script/pub_output.txt script/pub_output.txt.prev
 
 echo "Done!"

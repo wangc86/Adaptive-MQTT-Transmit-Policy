@@ -18,7 +18,7 @@ Contributors:
 
 #ifndef MQTT_PROTOCOL_H
 #define MQTT_PROTOCOL_H
-
+#define WITH_TIMESTAMP		//20230505 timestamp
 /*
  * File: mqtt_protocol.h
  *

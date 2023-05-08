@@ -155,7 +155,19 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 		mosq->send_time.tv_nsec=tp.tv_nsec;
 		
 	}
+#ifdef WITH_TIMESTAMP
+	struct timeval tp;
+	gettimeofday(&tp, NULL);		//暫時先用gettimeofday(因為同步問題，用clock_gettime的話兩邊時間會不一樣)
+	fprintf(stderr, "Bro_send: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
+	char timestamp[30];
+	char cpy_payload[payloadlen];
+	sprintf(timestamp, "%ld", tp.tv_sec*1000000+tp.tv_usec);
+	strcpy(cpy_payload,timestamp);
+	strcpy(payload+payloadlen-16,cpy_payload);
+	printf("bro_send_payload: %s\n", payload);
+#endif
 	
+
 	//Broker傳送PUBLISH給Client
 	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, mosq->address, dup, qos, retain, mid, mapped_topic, (long)payloadlen);		//2023加上address
 	// log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
@@ -208,6 +220,7 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 			packetlen += proplen + varbytes;
 		}
 	}
+
 	if(packet__check_oversize(mosq, packetlen)){
 #ifdef WITH_BROKER
 		log__printf(NULL, MOSQ_LOG_NOTICE, "Dropping too large outgoing PUBLISH for %s (%d bytes)", mosq->id, packetlen);
@@ -251,6 +264,5 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 	if(payloadlen){
 		packet__write_bytes(packet, payload, payloadlen);
 	}
-
 	return packet__queue(mosq, packet);
 }

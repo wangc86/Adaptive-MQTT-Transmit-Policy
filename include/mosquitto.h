@@ -18,7 +18,6 @@ Contributors:
 
 #ifndef MOSQUITTO_H
 #define MOSQUITTO_H
-
 /*
  * File: mosquitto.h
  *

@@ -94,7 +94,7 @@ static void my_message_callback(struct mosquitto *mosq, void *obj, const struct 
 	if(cfg.remove_retained && message->retain){
 		mosquitto_publish(mosq, &last_mid, message->topic, 0, NULL, 1, true);
 	}
-
+	
 	print_message(&cfg, message, properties);
 	if(ferror(stdout)){
 		mosquitto_disconnect_v5(mosq, 0, cfg.disconnect_props);

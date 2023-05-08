@@ -786,48 +786,21 @@ void output_init(void)
 
 void print_message(struct mosq_config *lcfg, const struct mosquitto_message *message, const mosquitto_property *properties)
 {
-	//1108 timestamps of subscriber
-	// struct timespec tp;
-	// if(clock_gettime(CLOCK_MONOTONIC, &tp))
-	// {
-	// 	perror("client/sub_client_output.c: print_message");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// fprintf(stderr, "%ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
-	// long time_pub_sned, time_bro_get, time_bro_send, time_sub_get;
+#ifdef WITH_TIMESTAMP
 
-	// long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
-	// long tmp2=floor(tmp/10000000000);
-	// time_sub_get=tmp-(tmp2*10000000000);
-
-	// char *remaining;	//for strtol (convert string to long)
-
-	// char tmp_all[31],tmp_pub[12],tmp_bro1[12],tmp_bro2[12],tmp_sub[12];
-	// strncpy(tmp_all,message->payload+message->payloadlen-31,31);
-
-	// strncpy(tmp_pub,tmp_all,11);
-	// tmp_pub[10]='\0';
-
-	// strncpy(tmp_bro1,tmp_all+10,11);
-	// tmp_bro1[10]='\0';
-
-	// strncpy(tmp_bro2,tmp_all+20,11);
-	// tmp_bro2[10]='\0';
-
-	// time_pub_sned = strtol(tmp_pub, &remaining, 10);
-	// time_bro_get = strtol(tmp_bro1, &remaining, 10);
-	// time_bro_send = strtol(tmp_bro2, &remaining, 10);
-
-	// if((time_bro_send-time_bro_get)<0){
-	// 	time_bro_send=time_bro_send+10000000000;
-	// }
-	// if((time_sub_get-time_pub_sned)<0){
-	// 	time_sub_get=time_sub_get+10000000000;
-	// }
-
-	// // printf(": %s\n",tmp_all);
-	// fprintf(stderr, "%ld %ld %ld %ld\n", time_pub_sned, time_bro_get, time_bro_send, time_sub_get);
-	// // fprintf(stderr, "%ld %ld %.3f\n", time_sub_get-time_pub_sned, time_bro_send-time_bro_get, ((float)(time_bro_send-time_bro_get)/(float)(time_sub_get-time_pub_sned)));
+	if(strcmp(message->topic, "latency")){
+		//20230505 timestamp of subscriber
+		struct timeval tp;
+		gettimeofday(&tp, NULL);
+		char *remaining;
+		char pub_send[17], bro_rec[17], bro_send[17];
+		strncpy(pub_send,message->payload+message->payloadlen-50,16);
+		strncpy(bro_rec,message->payload+message->payloadlen-33,16);
+		strncpy(bro_send,message->payload+message->payloadlen-16,16);
+		fprintf(stderr, "%ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec);
+		printf("%ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec);
+	}
+#endif
 	
 #ifdef WIN32
 	unsigned int r = 0;
