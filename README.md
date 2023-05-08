@@ -29,9 +29,13 @@ You also need to run the Latency Packet Sender to triggle this transmit policy
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i ==Lat_sender==
 
 ```
+##About Timestamp
+Open timestmp by add the code in [include/lib/mqtt_protocol.h]<https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h>
+```
+#define WITH_TIMESTAMP
+```
 
-Eclipse Mosquitto
-=================
+## Eclipse Mosquitto
 Mosquitto is an open source implementation of a server for version 5.0, 3.1.1,
 and 3.1 of the MQTT protocol. It also includes a C and C++ client library, and
 the `mosquitto_pub` and `mosquitto_sub` utilities for publishing and
