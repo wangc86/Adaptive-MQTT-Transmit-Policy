@@ -27,7 +27,7 @@ You also need to run the Latency Packet Sender to triggle this transmit policy
 ```
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i [Lat_sender]
 ```
-##About config file
+## About config file
 For the config file of the broker, there are something you can change for this project.
 ###
 
