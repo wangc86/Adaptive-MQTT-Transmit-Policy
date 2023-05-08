@@ -50,6 +50,9 @@ Setting by subscriber with
 --threshold_l [value]
 ```
 
+## Special setting in CONNECT packet
+If the subscriber want to use the design of this project, a special setting of the CONNECT packet is indeed. In CONNECT control flag bit 0, which is set to zero and reserve, is design to set to one if the subscriber want to use the design of this project, and it need to add the threshold_l value at the end of the payload of the CONNECT packet.
+
 ## Eclipse Mosquitto
 Mosquitto is an open source implementation of a server for version 5.0, 3.1.1,
 and 3.1 of the MQTT protocol. It also includes a C and C++ client library, and
