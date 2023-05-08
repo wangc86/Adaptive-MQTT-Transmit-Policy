@@ -29,11 +29,25 @@ You also need to run the Latency Packet Sender to triggle this transmit policy
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i [Lat_sender]
 
 ```
+##About config file
+For the config file of the broker, there are something you can change for this project.
+###
+
 ## About Timestamp
 Open timestmp by add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
 ```ruby
 #define WITH_TIMESTAMP
 ```
+
+## About Threshold
+###threshold_s
+Setting by config file of the broker, for example:
+```
+threshold_s 300
+```
+The default value is 100, you can change the default at [src/conf.c #L207](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/af2e91b6cd42c9d945e541132e5ceaa2f14cda5e/src/conf.c#L207)
+###threshold_l
+ 
 
 ## Eclipse Mosquitto
 Mosquitto is an open source implementation of a server for version 5.0, 3.1.1,
