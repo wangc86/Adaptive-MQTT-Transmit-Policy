@@ -12,26 +12,26 @@ make
 
 ## Quick start
 Run the Broker
-```
+```ruby
 ./src/mosquitto -c mosquitto.conf -v
 ```
 Run the Subscriber
-```
+```ruby
 ./client/mosquitto_sub -t latency -t topic -p port_number -h host_ip -q 1 -i ==Sub==
 ```
 Run the Publisher
-```
+```ruby
 ./client/mosquitto_pub -t topic -m "Message here~~~~~~~~~~~~~~~~~~~~~~~~" -p port_number -h host_ip -q 1 -i ==Pub==
 
 ```
 You also need to run the Latency Packet Sender to triggle this transmit policy
-```
+```ruby
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i ==Lat_sender==
 
 ```
 ##About Timestamp
 Open timestmp by add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
-```
+```ruby
 #define WITH_TIMESTAMP
 ```
 
