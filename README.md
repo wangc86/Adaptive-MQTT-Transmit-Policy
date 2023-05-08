@@ -29,7 +29,7 @@ You also need to run the Latency Packet Sender to triggle this transmit policy
 ./client/mosquitto_pub -t latency -m "this is a latency packet" -p port_number -h host_ip --repeat 200 --repeat-delay 10 -q 1 -i [Lat_sender]
 
 ```
-##About Timestamp
+## About Timestamp
 Open timestmp by add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
 ```ruby
 #define WITH_TIMESTAMP
