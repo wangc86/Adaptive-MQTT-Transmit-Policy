@@ -809,13 +809,19 @@ int client_config_line_proc(struct mosq_config *cfg, int pub_or_sub, int argc, c
 				fprintf(stderr, "Error: -m argument given but no message specified.\n\n");
 				return 1;
 			}else{
-				//1108
-				// char input[strlen(argv[i+1])+31];
-				// strcpy(input,argv[i+1]);
-				// strcat(input,"0000000000000000000000000000000");
-				// cfg->message = strdup(input);
-				// printf("**publisher->cfg->message: %s\n", cfg->message);
-				cfg->message = strdup(argv[i+1]);
+				//2023 timestamps
+				#ifdef WITH_TIMESTAMP
+				char input[strlen(argv[i+1])+50];
+				strcpy(input,argv[i+1]);
+				int i=0;
+				for(i=0; i<50; i++){
+					strcat(input,"*");
+				}
+				cfg->message = strdup(input);
+				#else
+				cfg->message = strdup(argv[i+1]);		//2023 ori
+				#endif
+				// printf("cfg->message: %s\n", cfg->message);
 				if(cfg->message == NULL){
 					fprintf(stderr, "Error: Out of memory.\n\n");
 					return 1;

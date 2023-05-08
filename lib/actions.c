@@ -69,7 +69,6 @@ int mosquitto_publish_v5(struct mosquitto *mosq, int *mid, const char *topic, in
 		rc = mosquitto_property_check_all(CMD_PUBLISH, outgoing_properties);
 		if(rc) return rc;
 	}
-
 	if(!topic || STREMPTY(topic)){
 		if(topic) topic = NULL;
 
@@ -112,7 +111,6 @@ int mosquitto_publish_v5(struct mosquitto *mosq, int *mid, const char *topic, in
 	if(mid){
 		*mid = local_mid;
 	}
-
 	if(qos == 0){
 		return send__publish(mosq, local_mid, topic, (uint32_t)payloadlen, payload, (uint8_t)qos, retain, false, outgoing_properties, NULL, 0);
 	}else{

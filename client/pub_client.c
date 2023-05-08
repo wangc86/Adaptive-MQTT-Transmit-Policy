@@ -114,49 +114,32 @@ void my_disconnect_callback(struct mosquitto *mosq, void *obj, int rc, const mos
 
 int my_publish(struct mosquitto *mosq, int *mid, const char *topic, int payloadlen, void *payload, int qos, bool retain)
 {
-	// //1108 timestamps of publisher
-	// struct timespec tp;
-	// if(clock_gettime(CLOCK_MONOTONIC, &tp))
-	// {
-	// 	perror("client/pub_client.c: my_publsih");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// fprintf(stderr, "Pub: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
-	
-	// // 1108
-	// long tmp=tp.tv_sec*1000000+tp.tv_nsec/1000;
-	// long tmp2=floor(tmp/10000000000);
-	// tmp2=tmp-(tmp2*10000000000);
-	// char tmp_payload[11];
-	// char cpy_payload[payloadlen];
-	
-	// // sprintf(tmp_payload, "%ld", tmp-(tmp2*1000000000));
-	// // fprintf(stderr, "tmp_payload: %s\n", tmp_payload);
-	// sprintf(tmp_payload, "%ld", tmp2 );
-	// if(strlen(tmp_payload)!=10){
-	// 	int i=0;
-	// 	for(i=0; i<(10-strlen(tmp_payload)); i++){
-	// 		tmp_payload[i]='0';
-	// 	}
-	// 	sprintf(tmp_payload+i, "%ld", tmp2 );
-	// }
-	// // sprintf(tmp_payload, "%ld", tmp2 );
-    
-	// // fprintf(stderr, "tmp_payload: %s\n", tmp_payload);
+	// 20230505 Timestamp
+#ifdef WITH_TIMESTAMP
+	struct timeval tp;
+	gettimeofday(&tp, NULL);		//暫時先用gettimeofday(因為同步問題，用clock_gettime的話兩邊時間會不一樣)
+	fprintf(stderr, "Pub: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
+	char timestamp[51];
+	char cpy_payload[payloadlen];
+	sprintf(timestamp, "%ldv", tp.tv_sec*1000000+tp.tv_usec);
+	strcpy(cpy_payload,timestamp);
+	int i=0;
+	for(i=0; i<33; i++){
+		strcat(cpy_payload,"0");
+	}
+	strcpy(payload+payloadlen-50,cpy_payload);
+	printf("pub_payload: %s\n", payload);
 
-	// strncpy(cpy_payload,payload,payloadlen-11);
-	// cpy_payload[payloadlen-31]='\0';
-	// strcat(cpy_payload,tmp_payload);
-	// strcat(cpy_payload,"00000000000000000000");
-	// strcpy(payload,cpy_payload);
-	// // fprintf(stderr, "pub_payload: %s\n", payload);
+#endif
 
 	ready_for_repeat = false;
 	if(cfg.protocol_version == MQTT_PROTOCOL_V5 && cfg.have_topic_alias && first_publish == false){
-		return mosquitto_publish_v5(mosq, mid, NULL, payloadlen, payload, qos, retain, cfg.publish_props);
+		return mosquitto_publish_v5(mosq, mid, NULL, payloadlen, payload, qos, retain, cfg.publish_props);		//ori
+		// return mosquitto_publish_v5(mosq, mid, NULL, payloadlen, cpy_payload, qos, retain, cfg.publish_props);
 	}else{
 		first_publish = false;
-		return mosquitto_publish_v5(mosq, mid, topic, payloadlen, payload, qos, retain, cfg.publish_props);
+		return mosquitto_publish_v5(mosq, mid, topic, payloadlen, payload, qos, retain, cfg.publish_props);		//ori
+		// return mosquitto_publish_v5(mosq, mid, topic, payloadlen, cpy_payload, qos, retain, cfg.publish_props);
 	}
 }
 
