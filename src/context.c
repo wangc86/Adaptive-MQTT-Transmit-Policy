@@ -50,6 +50,13 @@ struct mosquitto *context__init(mosq_sock_t sock)
 	context->send_time.tv_sec=0;						//20230406 Changes 初始化send_time
 	context->slow_mode_times=0;							//20230410 Changes 初始化slow_mode_times
 	context->threshold_l=0;				//20230412 Changes 初始化threshold_l fixed-me-here 這裡可以設定threshold_l
+	// #ifdef WITH_A_THRESHOLD				//20230525自動計算threshold_L
+	context->count_for_lat=0;
+	int i;								//20230525初始化lat_pre
+	for(i=1; i<5; i++){
+		context->lat_pre[i]=1000000;
+	}
+	// #endif
 	context->sock = sock;
 	context->last_msg_in = db.now_s;
 	context->next_msg_out = db.now_s + 60;

@@ -212,6 +212,12 @@ struct mosquitto_msg_data
 	struct mosquitto_client_msg *inflight;
 	struct mosquitto_client_msg *queued;
 	struct mosquitto_client_msg *storage; // 20230116新增一個storage用來暫存大檔案
+	//20230517 增加幾個storage讓他可以分類
+	// struct mosquitto_client_msg *storage1; //20230517 新增
+	// struct mosquitto_client_msg *storage2; //20230517 新增
+	// struct mosquitto_client_msg *storage3; //20230517 新增
+	// struct mosquitto_client_msg *storage4; //20230517 新增
+
 	struct mosquitto_client_msg *lat_list;//20230329 Changes專門放準備傳的latency packet
 	long msg_bytes;
 	long msg_bytes12;
@@ -256,6 +262,10 @@ struct mosquitto
 	// 20230209 Changes
 	//  time_t last_test;
 	//  time_t next_test;
+	// #ifdef WITH_A_THRESHOLD
+	long int lat_pre[5];	//20230525	自動計算threhold_l
+	int count_for_lat;			//20230525
+	// #endif
 	struct timespec latency_t;		//20230330
 	struct timespec send_time;		//20230330
 	uint16_t threshold_l;				//20230412 Set the threshold_l for every client(單位: ms)

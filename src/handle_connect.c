@@ -544,7 +544,7 @@ int handle__connect(struct mosquitto *context)
 	// printf("connect_flags: %d\n",connect_flags);
 	clean_start = (connect_flags & 0x02) >> 1;
 	uint8_t threshold_l_flag=(connect_flags & 0x01);		//20230501
-	printf("connect_flags_threshold_l: %d\n",threshold_l_flag);		//20230501
+	// printf("connect_flags_threshold_l: %d\n",threshold_l_flag);		//20230501
 	/* session_expiry_interval will be overriden if the properties are read later */
 	if(clean_start == false && protocol_version != PROTOCOL_VERSION_v5){
 		/* v3* has clean_start == false mean the session never expires */
@@ -722,6 +722,7 @@ int handle__connect(struct mosquitto *context)
 			rc = MOSQ_ERR_PROTOCOL;
 			goto handle_connect_error;
 		}
+		printf("context->threshold_l: %d\n",context->threshold_l);
 	}
 	
 	
@@ -730,7 +731,7 @@ int handle__connect(struct mosquitto *context)
 		rc = MOSQ_ERR_PROTOCOL;
 		goto handle_connect_error;
 	}
-	printf("context->threshold_l: %d\n",context->threshold_l);
+	
 	/* Once context->id is set, if we return from this function with an error
 	 * we must make sure that context->id is freed and set to NULL, so that the
 	 * client isn't erroneously removed from the by_id hash table. */

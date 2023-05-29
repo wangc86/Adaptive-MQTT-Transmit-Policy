@@ -26,6 +26,7 @@
         "mosquitto_broker_internal.h": "c",
         "client_shared.h": "c",
         "mqtt_protocol.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "cstdlib": "c"
     }
 }

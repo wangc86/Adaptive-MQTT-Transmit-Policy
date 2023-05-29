@@ -273,7 +273,7 @@ int handle__publish(struct mosquitto *context)
 		// 	exit(EXIT_FAILURE);
 		// }
 		gettimeofday(&tp, NULL);		//暫時先用gettimeofday(因為同步問題，用clock_gettime的話兩邊時間會不一樣)
-		fprintf(stderr, "Bro_rec: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
+		// fprintf(stderr, "Bro_rec: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
 		char timestamp[30];
 		char cpy_payload[msg->payloadlen];
 		sprintf(timestamp, "%ldv", tp.tv_sec*1000000+tp.tv_usec);
@@ -283,7 +283,7 @@ int handle__publish(struct mosquitto *context)
 			strcat(cpy_payload,"0");
 		}
 		strcpy(msg->payload+msg->payloadlen-33,cpy_payload);
-		printf("bro_rec_payload: %s\n", msg->payload);
+		// printf("bro_rec_payload: %s\n", msg->payload);
 	}
 	#endif
 
