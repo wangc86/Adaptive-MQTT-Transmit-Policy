@@ -1,0 +1,60 @@
+context->threshold_l: 5000
+.
+Broker received PubAck: 521092349351
+
+521092349351 SUB latency: 227796, threshold_l: 5000
+Mode Change...to slow_mode
+.
+.
+.
+Broker received PubAck: 521102382765
+
+521102382765 SUB latency: 248265, threshold_l: 5000
+.
+.
+.
+.
+Broker received PubAck: 521112377376
+
+521112377376 SUB latency: 228902, threshold_l: 5000
+.
+.
+.
+Broker received PubAck: 521122408400
+
+521122408400 SUB latency: 248260, threshold_l: 5000
+.
+.
+.
+Broker received PubAck: 521132428371
+
+521132428371 SUB latency: 257356, threshold_l: 5000
+.
+.
+.
+.
+Broker received PubAck: 521142461510
+
+521142461510 SUB latency: 279158, threshold_l: 5000
+.
+.
+.
+Broker received PubAck: 521152463427
+
+521152463427 SUB latency: 270358, threshold_l: 5000
+.
+.
+.
+Broker received PubAck: 521162466392
+
+521162466392 SUB latency: 262487, threshold_l: 5000
+.
+.
+.
+.
+Broker received PubAck: 521172513974
+
+521172513974 SUB latency: 297659, threshold_l: 5000
+.
+.
+.

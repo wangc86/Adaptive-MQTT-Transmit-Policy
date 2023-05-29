@@ -129,23 +129,41 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 			perror("client/pub_client.c: my_publsih");
 			exit(EXIT_FAILURE);
 		}
-		// printf("Broker received PubAck: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
+		// fprintf("Broker received PubAck: %ld\n", tp.tv_sec*1000000+tp.tv_nsec/1000);
 		//20230330
 		mosq->latency_t.tv_sec = tp.tv_sec - mosq->send_time.tv_sec;
 		mosq->latency_t.tv_nsec = tp.tv_nsec - mosq->send_time.tv_nsec;
 		long int tmp_lat = mosq->latency_t.tv_sec*1000000 + mosq->latency_t.tv_nsec/1000;
-		printf("\n%s latency: %ld, threshold_l: %ld\n",mosq->id,tmp_lat, mosq->threshold_l);
-		fprintf(stderr, "%s latency: %ld\n",mosq->id,tmp_lat);
+		// printf("\n%s latency: %ld, threshold_l: %ld\n",mosq->id,tmp_lat, mosq->threshold_l);
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		log__printf(NULL,MOSQ_LOG_DEBUG,"#latency_threshold_l: %s %ld %ld",mosq->id,tmp_lat, mosq->threshold_l);
+		fprintf(stderr, "#latency_threshold_l: %lld %s %ld %ld\n",(now.tv_sec*1000000+now.tv_usec),mosq->id,tmp_lat, mosq->threshold_l);
+		#ifdef WITH_A_THRESHOLD	//20230525自動計算thrshold_l
+		//20230525	由broker自動去計算threshold_l (5次的平均)
+		mosq->count_for_lat=mosq->count_for_lat%5;
+		int threshold_l_total=0;
+		mosq->lat_pre[mosq->count_for_lat]=tmp_lat;
+		int i;
+		for(i=0; i<5; i++){
+			threshold_l_total=threshold_l_total+mosq->lat_pre[i];
+		}
+		mosq->threshold_l=threshold_l_total/5;
+		log__printf(NULL,MOSQ_LOG_INFO,"count_for_lat: %ld",mosq->count_for_lat);
+		mosq->count_for_lat++;
+		#endif
 
 		//20230330判斷大於threshold_l的話切換成slow_mode
 		if(tmp_lat>=mosq->threshold_l && (mosquitto__get_mode(mosq)==normal_mode)){
 			mosquitto__set_mode(mosq, slow_mode);
-			printf("Mode Change...to slow_mode\n");
+			log__printf(NULL, MOSQ_LOG_INFO, "%s Mode Change...to slow_mode\n", mosq->id);
+			fprintf(stderr,"Mode Change...to slow_mode\n");
 			mosq->slow_mode_times=1;
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <slow_mode>", mosq->id);
 		}else if(tmp_lat<mosq->threshold_l && (mosquitto__get_mode(mosq)==slow_mode)){
 			mosquitto__set_mode(mosq, normal_mode);
-			printf("Mode Change...to normal_mode\n");
+			log__printf(NULL, MOSQ_LOG_INFO, "%s Mode Change...to normal_mode", mosq->id);
+			fprintf(stderr,"Mode Change...to normal_mode\n");
 			mosq->slow_mode_times=0;
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <normal_mode>", mosq->id);
 		}

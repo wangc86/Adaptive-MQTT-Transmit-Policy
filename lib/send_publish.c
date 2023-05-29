@@ -158,13 +158,13 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 #ifdef WITH_TIMESTAMP
 	struct timeval tp;
 	gettimeofday(&tp, NULL);		//暫時先用gettimeofday(因為同步問題，用clock_gettime的話兩邊時間會不一樣)
-	fprintf(stderr, "Bro_send: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
+	// fprintf(stderr, "Bro_send: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
 	char timestamp[30];
 	char cpy_payload[payloadlen];
 	sprintf(timestamp, "%ld", tp.tv_sec*1000000+tp.tv_usec);
 	strcpy(cpy_payload,timestamp);
 	strcpy(payload+payloadlen-16,cpy_payload);
-	printf("bro_send_payload: %s\n", payload);
+	// printf("bro_send_payload: %s\n", payload);
 #endif
 	
 

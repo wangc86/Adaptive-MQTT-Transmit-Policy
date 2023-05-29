@@ -128,7 +128,7 @@ int my_publish(struct mosquitto *mosq, int *mid, const char *topic, int payloadl
 		strcat(cpy_payload,"0");
 	}
 	strcpy(payload+payloadlen-50,cpy_payload);
-	printf("pub_payload: %s\n", payload);
+	// printf("pub_payload: %s\n", payload);
 
 #endif
 
