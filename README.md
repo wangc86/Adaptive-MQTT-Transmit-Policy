@@ -15,7 +15,9 @@ Run the Broker
 ```
 ./src/mosquitto -c mosquitto.conf -v
 ```
+
 Run the Subscriber (Subscriber should subscribe topic "latency" by QoS 1)
+
 ```
 ./client/mosquitto_sub -t latency -t topic -p port_number -h host_ip -q 1 -i [Sub]
 ```
