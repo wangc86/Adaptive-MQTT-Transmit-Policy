@@ -55,6 +55,12 @@ Automatic adjustment with add the code in [include/lib/mqtt_protocol.h](https://
 ```ruby
 #define WITH_A_THRESHOLD
 ```
+## About msg_store_timeout
+msg_store_timeout is the time that the message can stay in the storage, when  it timeout, whatever the subscriber transfer mode, broker will push the message to inflight.
+Setting by config file of the broker, for example:
+```
+msg_store_timeout 30
+```
 
 ## Special setting in CONNECT packet
 If the subscriber want to use the design of this project, a special setting of the CONNECT packet is indeed. In CONNECT control flag bit 0, which is set to zero and reserve, is design to set to one if the subscriber want to use the design of this project, and it need to add the threshold_l value at the end of the payload of the CONNECT packet.
