@@ -187,6 +187,8 @@ int mosquitto_main_loop(struct mosquitto__listener_sock *listensock, int listens
 	if(rc) return rc;
 #endif
 	create_the_timer(SIGUSR1 ,3);	//20230329 Changes 建立timer，實作於mosquitto.c，第二個參數為計時器秒數
+	log__printf(NULL, MOSQ_LOG_INFO, "threshold_s= %ld", db.config->threshold_s);		//20230529
+	log__printf(NULL, MOSQ_LOG_INFO, "msg_store_timeout= %d", db.config->msg_store_timeout);		//20230529
 	while(run){
 		queue_plugin_msgs();
 		context__free_disused();
@@ -200,7 +202,6 @@ int mosquitto_main_loop(struct mosquitto__listener_sock *listensock, int listens
 #ifdef WITH_BRIDGE
 		bridge_check();
 #endif
-
 		rc = mux__handle(listensock, listensock_count);
 		if(rc) return rc;
 

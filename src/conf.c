@@ -205,6 +205,7 @@ static void config__init_reload(struct mosquitto__config *config)
 	config->sys_interval = 10;
 	config->upgrade_outgoing_qos = false;
 	config->threshold_s = 100;		//20230209 threshold_s的預設值
+	config->msg_store_timeout=20;	//20230529  msg_store_timeout的預設值，訊息最長允許的delay時間
 	// config->threshold_l = 300;		//20230330 threshold_l的預設值
 	config__cleanup_plugins(config);
 }
@@ -1695,11 +1696,17 @@ static int config__read_file_core(struct mosquitto__config *config, bool reload,
 				}else if(!strcmp(token, "threshold_s")){		//20230209 config for packet size
 					if(conf__parse_int(&token, "threshold_s", &tmp_int, saveptr)) return MOSQ_ERR_INVAL;
 					if(tmp_int < 0) tmp_int = 0;
-					config->threshold_s = tmp_int;
+					config->threshold_s = (size_t)tmp_int;
+					log__printf(NULL, MOSQ_LOG_INFO, "threshold_s= %d.",tmp_int);
 				// }else if(!strcmp(token, "threshold_l")){		//20230330 config for threshold_l
 				// 	if(conf__parse_int(&token, "threshold_l", &tmp_int, saveptr)) return MOSQ_ERR_INVAL;
 				// 	if(tmp_int < 0) tmp_int = 0;
 				// 	config->threshold_l = (size_t)tmp_int;
+				}else if(!strcmp(token, "msg_store_timeout")){		//20230529 config for msg_store_timeout
+					if(conf__parse_int(&token, "msg_store_timeout", &tmp_int, saveptr)) return MOSQ_ERR_INVAL;
+					if(tmp_int < 0) tmp_int = 0;
+					config->msg_store_timeout = tmp_int;
+					log__printf(NULL, MOSQ_LOG_INFO, "msg_store_timeout= %d.",tmp_int);
 				}else if(!strcmp(token, "memory_limit")){
 					ssize_t lim;
 					if(conf__parse_ssize_t(&token, "memory_limit", &lim, saveptr)) return MOSQ_ERR_INVAL;
