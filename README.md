@@ -34,7 +34,7 @@ For the config file of the broker, there are something you can change for this p
 ###
 
 ## About Timestamp
-Open timestmp by add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
+Open timestamp by add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
 ```ruby
 #define WITH_TIMESTAMP
 ```
@@ -50,6 +50,10 @@ The default value is 100, you can change the default at [src/conf.c #L207](https
 Setting by subscriber with
 ```
 --threshold_l [value]
+```
+Automatic adjustment with add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
+```ruby
+#define WITH_A_THRESHOLD
 ```
 
 ## Special setting in CONNECT packet
