@@ -1259,7 +1259,6 @@ int db__message_write_queued_in(struct mosquitto *context)
 	}
 	// printf("...db__message_write_queued_in2...\n");
 	DL_FOREACH_SAFE(context->msgs_in.queued, tail, tmp){
-		printf("...db__message_write_queued_in3...\n");
 		if(context->msgs_out.inflight_maximum != 0 && context->msgs_in.inflight_quota == 0){
 			break;
 		}
@@ -1322,15 +1321,15 @@ int db__message_write_storage_out(struct mosquitto *context)
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;
 	}
-	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){		//20230418檢測目前的訊息有沒有超過deadline的（檢查第一封就好）
-		printf("timestamp: %ld\n",tail->storage_time.tv_sec);
+	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){		//20230418檢測目前的訊息有沒有超過deadline的（檢查第一封就好）timeout
+		log__printf(NULL,MOSQ_LOG_DEBUG,"timestamp: %ld\n",tail->storage_time.tv_sec);
 		struct timespec tp;						//20230418 Now time
 		if(clock_gettime(CLOCK_MONOTONIC, &tp))
 		{
 			perror("client/pub_client.c: my_publsih");
 			exit(EXIT_FAILURE);
 		}
-		if((tp.tv_sec-tail->storage_time.tv_sec)< 60){		//20230418 60為msg可以保留在storage中的時間(單位： 秒)
+		if((tp.tv_sec-tail->storage_time.tv_sec)< db.config->msg_store_timeout){		//20230418 msg_store_timeout為msg可以保留在storage中的時間(單位： 秒)
 			break;
 		}		
 

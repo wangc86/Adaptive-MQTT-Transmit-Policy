@@ -314,6 +314,7 @@ struct mosquitto__config {
 	struct mosquitto__security_options security_options;
 	//20230209
 	size_t threshold_s;	//20230209Changes threshold for packet size,0321型態從int改為size_t
+	int msg_store_timeout;		//20230529 設定message在storage中的最大時間要是多少（單位:seconds）
 	// int threshold_l;	//20230330 Changes
 };
 
