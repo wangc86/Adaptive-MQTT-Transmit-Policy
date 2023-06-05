@@ -718,7 +718,7 @@ int handle__connect(struct mosquitto *context)
 	// 	}
 	// }
 	if(threshold_l_flag){		//20230503
-		if(packet__read_uint16(&context->in_packet, &(context->threshold_l))){
+		if(packet__read_uint32(&context->in_packet, &(context->threshold_l))){
 			rc = MOSQ_ERR_PROTOCOL;
 			goto handle_connect_error;
 		}
