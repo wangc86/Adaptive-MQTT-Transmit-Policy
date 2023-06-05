@@ -48,7 +48,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	uint32_t proplen = 0, varbytes;
 	mosquitto_property *local_props = NULL;
 	uint16_t receive_maximum;
-	uint16_t threshold_l; //20230427 threshold_l in CONNECT packet
+	uint32_t threshold_l; //20230427 threshold_l in CONNECT packet
 
 	assert(mosq);
 
@@ -137,7 +137,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 		payloadlen += (uint32_t)(2+strlen(password));
 	}
 	if(threshold_l>0){
-		payloadlen += (uint16_t)(2);		//20230427 threshold_l 預設最大六位
+		payloadlen += (uint32_t)(4);		//20230427 threshold_l 預設最大六位
 	}
 
 	packet->command = CMD_CONNECT;
@@ -215,7 +215,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 
 	//20230427 在CONNECT封包中加入threshold_l
 	if(threshold_l>0){
-		packet__write_uint16(packet, threshold_l);
+		packet__write_uint32(packet, threshold_l);
 	}
 
 	mosq->keepalive = keepalive;

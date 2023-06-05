@@ -35,7 +35,8 @@ Contributors:
 
 
 int handle__publish(struct mosquitto *context)
-{
+{	
+	//這裡屬於broker的程式
 	// printf("context->in_packet.command: %d",context->in_packet.command);
 	uint8_t dup;
 	int rc = 0;
@@ -58,7 +59,6 @@ int handle__publish(struct mosquitto *context)
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_PROTOCOL;
 	}
-
 	msg = mosquitto__calloc(1, sizeof(struct mosquitto_msg_store));
 	if(msg == NULL){
 		return MOSQ_ERR_NOMEM;

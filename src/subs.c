@@ -128,6 +128,7 @@ static int subs__shared_process(struct mosquitto__subhier *hier, const char *top
 
 static int subs__process(struct mosquitto__subhier *hier, const char *source_id, const char *topic, uint8_t qos, int retain, struct mosquitto_msg_store *stored)
 {
+	//只有有符合topic的subscriber訂閱才會跑到這裡
 	int rc = 0;
 	int rc2;
 	struct mosquitto__subleaf *leaf;
@@ -482,7 +483,7 @@ static int sub__search(struct mosquitto__subhier *subhier, char **split_topics, 
 	struct mosquitto__subhier *branch;
 	int rc;
 	bool have_subscribers = false;
-	//20230321在這裡比對topic嗎？不確定，但應該是
+	//20230321在這裡比對topic嗎？不確定，但應該是(不管有沒有subscriber訂閱都會跑到這裡)
 	if(split_topics && split_topics[0]){
 		/* Check for literal match */
 		HASH_FIND(hh, subhier->children, split_topics[0], strlen(split_topics[0]), branch);
@@ -659,7 +660,7 @@ int sub__messages_queue(const char *source_id, const char *topic, uint8_t qos, i
 	clients - this is required because websockets client calls
 	db__message_write(), which could remove the message if ref_count==0.
 	*/
-	db__msg_store_ref_inc(*stored);
+	db__msg_store_ref_inc(*stored);		//增加一個引用 (stored->ref_count++)
 	//HASH_FIND: 在db.subs中找有沒有split_topics[0]並把結果放在subhier
 	HASH_FIND(hh, db.subs, split_topics[0], strlen(split_topics[0]), subhier);
 	// struct mosquitto__subhier *s;

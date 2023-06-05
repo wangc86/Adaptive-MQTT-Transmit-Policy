@@ -1,9 +1,9 @@
 #!/bin/bash
-N_sub=45
-broker_host="34.227.7.99"
+N_sub=5
+broker_host="localhost"
 port_num="1884"
 QoS=1
-file="0525"
+file="0601"
 
 echo "Starting the Subscriber(s).."
 for i in $(seq 1 $N_sub); do

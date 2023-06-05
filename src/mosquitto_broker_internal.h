@@ -685,7 +685,7 @@ int db__message_write_inflight_out_latest(struct mosquitto *context);
 int db__message_write_queued_out(struct mosquitto *context);
 int db__message_write_queued_in(struct mosquitto *context);
 //20230116 自己新增的部分( write by Maggie)
-void db__message_destorage_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data);
+void db__message_destorage_first(struct mosquitto *context, struct mosquitto_msg_data *msg_data, int queue_or_inflight);		//20230601
 int db__message_write_storage_out(struct mosquitto *context);
 
 /* ============================================================

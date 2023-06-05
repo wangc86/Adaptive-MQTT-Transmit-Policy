@@ -240,6 +240,7 @@ int mosquitto_main_loop(struct mosquitto__listener_sock *listensock, int listens
 			log__init(db.config);
 			flag_reload = false;
 		}
+		// flag_tree_print=true;		//20230531
 		if(flag_tree_print){
 			sub__tree_print(db.subs, 0);
 			flag_tree_print = false;
