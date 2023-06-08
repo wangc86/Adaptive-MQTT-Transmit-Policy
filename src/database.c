@@ -473,6 +473,13 @@ int db__message_insert(struct mosquitto *context, uint16_t mid, enum mosquitto_m
 	if(context->sock != INVALID_SOCKET){
 		//---20230112 Change 在這裡可以把message改為加入queue而不是加入inflight
 		log__printf(NULL, MOSQ_LOG_INFO,"---stored->payloadlen---: %d",stored->payloadlen);
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		if(context->slow_mode_time.tv_sec+30<now.tv_sec){	//20230605不能處於slow mode超過60秒
+			log__printf(MOSQ_LOG_INFO, "%s overtime, turn back to normal_mode",context->id);
+			printf(stderr, "%s overtime, turn back to normal_mode\n",context->id);
+			mosquitto__set_mode(context, normal_mode);		//20230605
+		}
 		if(stored->payloadlen>=db.config->threshold_s && context->mode==slow_mode && (strcmp(stored->topic,"latency")!=0)){		//20230209 db.config->threshold_s ,20230321 Changes 加入mode條件
 			// printf("****payloadlen>threshold_s, msg->state = mosq_ms_storage****\n");
 			state = mosq_ms_storage;		//20230116把qos=1的message狀態改為mosq_ms_storage
@@ -1279,10 +1286,10 @@ int db__message_write_storage_out(struct mosquitto *context)
 {
 	// printf("...db__message_write_storage_out...\n");
 	// printf("CONTEXT_ID: %s\n", context->id);
-	int count=0;
+	int count=0, count2=0;
 	struct mosquitto_client_msg *tail, *tmp, *elt;	//20230316 Changes後面用到DL_COUNT跟DL_FOREACH_SAFE需要的
 	DL_COUNT(context->msgs_out.storage, elt, count);		//20230316 Changees 為了計算storage裡有幾個message，可以拿掉，對功能來說沒有用處，Debug用
-	log__printf(NULL,MOSQ_LOG_DEBUG,"#storage: %s %d", context->id,count);
+	
 	
 	if(context->state != mosq_cs_active){
 		return MOSQ_ERR_SUCCESS;
@@ -1295,12 +1302,13 @@ int db__message_write_storage_out(struct mosquitto *context)
 	}
 	struct timeval now;
 	gettimeofday(&now, NULL);
-	fprintf(stderr, "%ld #storage: %s %d\n",(now.tv_sec*1000000+now.tv_usec), context->id,count);
+	
 	DL_FOREACH_SAFE(context->msgs_out.storage, tail, tmp){		//20230418檢測目前的訊息有沒有超過deadline的（檢查第一封就好）timeout
 		log__printf(NULL,MOSQ_LOG_DEBUG,"timestamp(now_time, storage_time): %ld %ld\n",tp.tv_sec, tail->storage_time.tv_sec);
 		if((tp.tv_sec-tail->storage_time.tv_sec)> db.config->msg_store_timeout || context->mode==normal_mode){		//20230418 msg_store_timeout為msg可以保留在storage中的時間(單位： 秒)
 			log__printf(NULL,MOSQ_LOG_DEBUG,"msg(%d) destorage", tail->mid);
-			if((tp.tv_sec-tail->storage_time.tv_sec)> db.config->msg_store_timeout)
+			if((tp.tv_sec-tail->storage_time.tv_sec)> db.config->msg_store_timeout && context->mode!=normal_mode)
+				log__printf(NULL,MOSQ_LOG_DEBUG,"msg(%d) timeout", tail->mid);
 				fprintf(stderr, "%s msg(%d) timeout!!!\n",context->id, tail->mid);
 			if(context->msgs_out.inflight_maximum != 0 && context->msgs_out.inflight_quota == 0){
 				db__message_destorage_first(context, &context->msgs_out, 0);
@@ -1321,5 +1329,8 @@ int db__message_write_storage_out(struct mosquitto *context)
 			}	
 		}
 	}
+	DL_COUNT(context->msgs_out.storage, elt, count2);
+	log__printf(NULL,MOSQ_LOG_DEBUG,"#storage: %s %d %d", context->id,count,count2);
+	fprintf(stderr, "%ld #storage: %s %d %d\n",(now.tv_sec*1000000+now.tv_usec), context->id,count,count2);
 	return MOSQ_ERR_SUCCESS;
 }
