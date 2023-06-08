@@ -154,16 +154,18 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 
 		//20230330判斷大於threshold_l的話切換成slow_mode
 		if(tmp_lat>=mosq->threshold_l){
+			if(mosquitto__get_mode(mosq)==0)
+				mosq->slow_mode_time.tv_sec=now.tv_sec;
 			mosquitto__set_mode(mosq, slow_mode);
 			log__printf(NULL, MOSQ_LOG_INFO, "%s Mode Change...to slow_mode\n", mosq->id);
 			fprintf(stderr,"%s Mode Change...to slow_mode\n", mosq->id);
-			mosq->slow_mode_times++;
+			
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <slow_mode>", mosq->id);
 		}else{
 			mosquitto__set_mode(mosq, normal_mode);
 			log__printf(NULL, MOSQ_LOG_INFO, "%s Mode Change...to normal_mode", mosq->id);
 			fprintf(stderr,"%s Mode Change...to normal_mode\n", mosq->id);
-			mosq->slow_mode_times=0;
+			mosq->slow_mode_time.tv_sec=0;
 			// log__printf(NULL, MOSQ_LOG_DEBUG, "%s  transfer mode change to <normal_mode>", mosq->id);
 		}
 
@@ -173,7 +175,7 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 
 		if(mosquitto__get_mode(mosq)==slow_mode){
 			// fprintf(stderr, "%s : <slow_mode>\n", mosq->id);
-			mosq->slow_mode_times++;
+			// mosq->slow_mode_times++;
 			log__printf(NULL, MOSQ_LOG_DEBUG, "%s : <slow_mode>\n", mosq->id);
 			// if(mosq->slow_mode_times>10){
 			// 	log__printf(NULL, MOSQ_LOG_DEBUG, "%s : slow_mode_times>10, turn to Nnormal_mode\n", mosq->id);
