@@ -46,7 +46,7 @@ Setting by config file of the broker, for example:
 threshold_s 300
 ```
 The default value is 100, you can change the default at [src/conf.c #L207](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/af2e91b6cd42c9d945e541132e5ceaa2f14cda5e/src/conf.c#L207).
-### threshold_l (unit: ms)
+### threshold_l (unit: us)
 Setting by subscriber with
 ```
 --threshold_l [value]
