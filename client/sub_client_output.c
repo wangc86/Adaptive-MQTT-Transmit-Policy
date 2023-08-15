@@ -797,8 +797,8 @@ void print_message(struct mosq_config *lcfg, const struct mosquitto_message *mes
 		strncpy(pub_send,message->payload+message->payloadlen-50,16);
 		strncpy(bro_rec,message->payload+message->payloadlen-33,16);
 		strncpy(bro_send,message->payload+message->payloadlen-16,16);
-		fprintf(stderr, "%ld %ld %ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec, message->mid, message->payloadlen);
-		printf("%ld %ld %ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec, message->mid, message->payloadlen);
+		fprintf(stderr, "%ld %ld %ld %ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec, message->mid, message->payloadlen, message->qos);
+		// printf("%ld %ld %ld %ld %ld %ld %ld\n",strtol(pub_send, &remaining, 10),strtol(bro_rec, &remaining, 10) ,strtol(bro_send, &remaining, 10), tp.tv_sec*1000000+tp.tv_usec, message->mid, message->payloadlen, message->qos);
 	}
 #endif
 	

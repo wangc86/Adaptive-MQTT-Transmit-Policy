@@ -1023,6 +1023,7 @@ ssize_t net__read(struct mosquitto *mosq, void *buf, size_t count)
 
 ssize_t net__write(struct mosquitto *mosq, const void *buf, size_t count)
 {
+	// printf("net__write\n");
 #ifdef WITH_TLS
 	int ret;
 #endif
