@@ -1,1 +1,3 @@
-help!!!
+Error: Unknown option '–i'.
+
+Use 'mosquitto_sub --help' to see usage.

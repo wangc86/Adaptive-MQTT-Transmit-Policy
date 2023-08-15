@@ -83,6 +83,7 @@ void mosquitto__free(void *mem)
 void *mosquitto__malloc(size_t size)
 {
 	void *mem;
+	// printf("mosquitto__malloc: %d\n", size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
 	if(mem_limit && memcount + size > mem_limit){

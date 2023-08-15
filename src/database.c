@@ -1058,6 +1058,7 @@ int db__message_release_incoming(struct mosquitto *context, uint16_t mid)
 //這裡的context就是要送出的client?!!
 static int db__message_write_inflight_out_single(struct mosquitto *context, struct mosquitto_client_msg *msg)
 {
+	// printf("address of msg %p\n",(void *)msg->store);
 	// printf("db__message_write_inflight_out_single\n");
 	mosquitto_property *cmsg_props = NULL, *store_props = NULL;
 	int rc;

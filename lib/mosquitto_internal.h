@@ -168,6 +168,9 @@ struct session_expiry_list
 struct mosquitto__packet
 {
 	uint8_t *payload;
+	const void *payload_store;	//20230615 指針指向mosquitto db裡存的msg payload
+	uint32_t payload_length;	//20230615 紀錄要傳的訊息payload有多長
+	uint8_t pub_or_not;			//20230615
 	struct mosquitto__packet *next;
 	uint32_t remaining_mult;
 	uint32_t remaining_length;

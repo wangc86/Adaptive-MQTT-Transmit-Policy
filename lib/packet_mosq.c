@@ -70,11 +70,25 @@ int packet__alloc(struct mosquitto__packet *packet)
 	}while(remaining_length > 0 && packet->remaining_count < 5);
 	if(packet->remaining_count == 5) return MOSQ_ERR_PAYLOAD_SIZE;
 	packet->packet_length = packet->remaining_length + 1 + (uint8_t)packet->remaining_count;
+// 20230615
 #ifdef WITH_WEBSOCKETS
-	packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length + LWS_PRE);
+	if(packet->pub_or_not==4)
+		packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length-packet->payload_length+ LWS_PRE);
+	else
+		packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length + LWS_PRE);
 #else
-	packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length);
+	if(packet->pub_or_not==4){
+		packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length-packet->payload_length);
+		// printf("size: %d\n",sizeof(uint8_t)*packet->packet_length-packet->payload_length);
+	}	
+	else{
+		packet->payload = mosquitto__malloc(sizeof(uint8_t)*packet->packet_length);
+		// printf("size: %d\n",sizeof(uint8_t)*packet->packet_length);
+	}
+		
 #endif
+
+
 	if(!packet->payload) return MOSQ_ERR_NOMEM;
 
 	packet->payload[0] = packet->command;
@@ -85,6 +99,7 @@ int packet__alloc(struct mosquitto__packet *packet)
 
 	return MOSQ_ERR_SUCCESS;
 }
+
 
 void packet__cleanup(struct mosquitto__packet *packet)
 {
@@ -97,6 +112,9 @@ void packet__cleanup(struct mosquitto__packet *packet)
 	packet->remaining_length = 0;
 	mosquitto__free(packet->payload);
 	packet->payload = NULL;
+	packet->pub_or_not = 0;				//20230615
+	packet->payload_length = 0;			//20230615
+	packet->payload_store = NULL;		//20230615
 	packet->to_process = 0;
 	packet->pos = 0;
 }
@@ -247,7 +265,15 @@ int packet__write(struct mosquitto *mosq)
 
 	while(mosq->current_out_packet){
 		packet = mosq->current_out_packet;
-
+		if(packet->pub_or_not==4){		//20230615 判斷是不是PUBLISH packet
+			uint8_t *tmp_payload=packet->payload;	//先記錄下本來存放packet->payload的空間
+			packet->payload=mosquitto__malloc(sizeof(uint8_t)*packet->packet_length);		//重新分配一個空間給packet->payload
+			if(!packet->payload) return MOSQ_ERR_NOMEM;
+			memcpy(packet->payload, tmp_payload, sizeof(uint8_t)*packet->packet_length-packet->payload_length);
+			memcpy(packet->payload+sizeof(uint8_t)*packet->packet_length-packet->payload_length,
+			 packet->payload_store, sizeof(uint8_t)*packet->payload_length);		//20230615 在這裡再把message的payload串進來
+			mosquitto__free(tmp_payload);	//先本來存放packet->payload的空間free掉
+		}
 		while(packet->to_process > 0){
 			write_length = net__write(mosq, &(packet->payload[packet->pos]), packet->to_process);
 			if(write_length > 0){

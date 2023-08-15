@@ -180,9 +180,10 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 	return send__real_publish(mosq, mid, topic, payloadlen, payload, qos, retain, dup, cmsg_props, store_props, expiry_interval);
 }
 
-
+// 20230615
 int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint32_t payloadlen, const void *payload, uint8_t qos, bool retain, bool dup, const mosquitto_property *cmsg_props, const mosquitto_property *store_props, uint32_t expiry_interval)
 {
+	// printf("%s\n", __func__);
 	struct mosquitto__packet *packet = NULL;
 	unsigned int packetlen;
 	unsigned int proplen = 0, varbytes;
@@ -236,11 +237,17 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 	packet->mid = mid;
 	packet->command = (uint8_t)(CMD_PUBLISH | (uint8_t)((dup&0x1)<<3) | (uint8_t)(qos<<1) | retain);
 	packet->remaining_length = packetlen;
+	//20230615
+	packet->pub_or_not=4;				//紀錄這是一個PUBLISH packet
+	packet->payload_length=payloadlen;	//紀錄payload還需要多少長度
 	rc = packet__alloc(packet);
 	if(rc){
 		mosquitto__free(packet);
 		return rc;
 	}
+	// printf("-payloadlen: %d\n", payloadlen);
+	// printf("-packet->packet_length: %d\n", packet->packet_length);
+	// printf("-packetlen: %d\n", packetlen);
 	/* Variable header (topic string) */
 	if(topic){
 		packet__write_string(packet, topic, (uint16_t)strlen(topic));
@@ -260,9 +267,11 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 		}
 	}
 
-	/* Payload */
-	if(payloadlen){
-		packet__write_bytes(packet, payload, payloadlen);
-	}
+	/* Payload */ //20230615把payload寫進去
+	packet->payload_store=payload;		//20230615 把指針指向存在mosquitto db裡的message payload
+	// if(payloadlen){
+	// 	packet__write_bytes(packet, payload, payloadlen);
+	// }
+
 	return packet__queue(mosq, packet);
 }

@@ -18,8 +18,9 @@ Contributors:
 
 #ifndef MQTT_PROTOCOL_H
 #define MQTT_PROTOCOL_H
-#define WITH_TIMESTAMP		//20230505 timestamp
-// #define WITH_A_THRESHOLD	//20230525 自動threshold_l
+//#define WITH_TIMESTAMP		//20230505 timestamp
+#define WITH_A_THRESHOLD	//20230525 自動threshold_l
+// #define WWITH_MEMORY_MALLOC_CHANGE	//202301615 
 /*
  * File: mqtt_protocol.h
  *
