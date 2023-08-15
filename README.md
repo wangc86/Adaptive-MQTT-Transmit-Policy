@@ -47,16 +47,17 @@ threshold_s 300
 ```
 The default value is 100, you can change the default at [src/conf.c #L207](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/af2e91b6cd42c9d945e541132e5ceaa2f14cda5e/src/conf.c#L207).
 ### threshold_l (unit: us)
-Setting by subscriber with
+Fixed threshold_l is set by the subscriber with
 ```
 --threshold_l [value]
 ```
-Automatic adjustment with add the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
+Dynamic threshold_l is automatically adjust by the broker, by inserting the code in [include/lib/mqtt_protocol.h](https://github.com/maggie62755/Adaptive-MQTT-Transmit-Policy/blob/main/include/mqtt_protocol.h)
 ```ruby
 #define WITH_A_THRESHOLD
+
 ```
 ## About msg_store_timeout
-msg_store_timeout is the time that the message can stay in the storage, when  it timeout, whatever the subscriber transfer mode, broker will push the message to inflight.
+msg_store_timeout is the time that the message can stay in the storage, when it timeout, whatever the subscriber transfer mode, the broker will push the message to inflight.
 Setting by config file of the broker, for example:
 ```
 msg_store_timeout 30
