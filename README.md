@@ -1,8 +1,8 @@
 Adaptive-MQTT-Transmit-Policy
 =================
-This project is a new transmit policy which design for MQTT communication protocol.
-The new design is implement on mosuqitto, an open source MQTT implementation.
-Excepct the broker, you can use implementation of MQTT to run your client.
+This project is a new transmission policy designed for the MQTT communication protocol.
+The new design has been implemented on Eclipse Mosuqitto, an open source MQTT implementation.
+Besides the broker, you can use this implementation of MQTT to run your client.
 
 ## Installing on Linux
 Download the whole file and run it by make
@@ -77,4 +77,8 @@ subscribing.
 - MQTT v3.1.1 standard: <https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html>
 - MQTT v5.0 standard: <https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html>
 
+## Raw data from some experiments conducted at National Taiwan Normal University
+See the folder __script__ for our experimental raw data
 
+## Analytical simulations
+Some additional latency simulation scripts can be found in folder __simulation__. They serve the purpose of testing with various message withholding policy.
