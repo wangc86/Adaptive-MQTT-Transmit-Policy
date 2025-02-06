@@ -137,7 +137,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 		payloadlen += (uint32_t)(2+strlen(password));
 	}
 	if(threshold_l>0){
-		payloadlen += (uint32_t)(4);		//20230427 threshold_l 預設最大六位
+		payloadlen += (uint32_t)(4);		//20230427 threshold_l; by default 6 digits at max
 	}
 
 	packet->command = CMD_CONNECT;
@@ -174,7 +174,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	if(mosq->password){
 		byte = byte | 0x1<<6;
 	}
-	// 20230427 借用CONNECT flags Bit 0 參考MQTT-v5 Standards
+	// 20230427 borrow CONNECT flags Bit 0; see the MQTT-v5 Standards
 	if(threshold_l>0){
 		byte = byte | 0x1<<0;
 	}
@@ -213,7 +213,7 @@ int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session
 	}
 	// printf("payload: %s\n",packet->payload);
 
-	//20230427 在CONNECT封包中加入threshold_l
+	//20230427 add threshold_l in CONNECT packet
 	if(threshold_l>0){
 		packet__write_uint32(packet, threshold_l);
 	}
