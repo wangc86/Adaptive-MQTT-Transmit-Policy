@@ -79,7 +79,7 @@ enum mosquitto_msg_direction
 	mosq_md_out = 1
 };
 
-// 20230320 Changes加上不同的mode
+// 20230320 modes added
 enum transfer_mode
 {
 	normal_mode = 0,
@@ -168,8 +168,8 @@ struct session_expiry_list
 struct mosquitto__packet
 {
 	uint8_t *payload;
-	const void *payload_store;	//20230615 指針指向mosquitto db裡存的msg payload
-	uint32_t payload_length;	//20230615 紀錄要傳的訊息payload有多長
+	const void *payload_store;	//20230615 pointer to msg payload in mosquitto db
+	uint32_t payload_length;	//20230615 for payload length
 	uint8_t pub_or_not;			//20230615
 	struct mosquitto__packet *next;
 	uint32_t remaining_mult;
@@ -214,14 +214,14 @@ struct mosquitto_msg_data
 #ifdef WITH_BROKER
 	struct mosquitto_client_msg *inflight;
 	struct mosquitto_client_msg *queued;
-	struct mosquitto_client_msg *storage; // 20230116新增一個storage用來暫存大檔案
-	//20230517 增加幾個storage讓他可以分類
-	// struct mosquitto_client_msg *storage1; //20230517 新增
-	// struct mosquitto_client_msg *storage2; //20230517 新增
-	// struct mosquitto_client_msg *storage3; //20230517 新增
-	// struct mosquitto_client_msg *storage4; //20230517 新增
+	struct mosquitto_client_msg *storage; // 20230116 adding storage for large messages
+	//20230517 adding several storages for classification
+	// struct mosquitto_client_msg *storage1; //20230517 added
+	// struct mosquitto_client_msg *storage2; //20230517 added
+	// struct mosquitto_client_msg *storage3; //20230517 added
+	// struct mosquitto_client_msg *storage4; //20230517 added
 
-	struct mosquitto_client_msg *lat_list;//20230329 Changes專門放準備傳的latency packet
+	struct mosquitto_client_msg *lat_list;//20230329 save latency packet
 	long msg_bytes;
 	long msg_bytes12;
 	int msg_count;
@@ -266,16 +266,16 @@ struct mosquitto
 	//  time_t last_test;
 	//  time_t next_test;
 	// #ifdef WITH_A_THRESHOLD
-	long int lat_pre[5];	//20230525	自動計算threhold_l
+	long int lat_pre[5];	//20230525	auto compute threhold_l
 	int count_for_lat;			//20230525
 	// #endif
 	struct timespec latency_t;		//20230330
 	struct timespec send_time;		//20230330
-	uint32_t threshold_l;				//20230412 Set the threshold_l for every client(單位: ms)
+	uint32_t threshold_l;				//20230412 Set the threshold_l for every client(unit: ms)
 	// time_t latency_t;			//20230321 Changes test latency
 	// time_t send_lat_t;			//20230321 Changes the time that send latency.
-	enum transfer_mode mode; 	// 20230320 Changes 加上transfer mode： 0為normal mode, 1為slow mode,還沒初始化
-	struct timeval slow_mode_time;		//20230605//20230410 Slow mode 累積幾次，若累積太多次會先將模式改為Normal，下一次再重新計算。
+	enum transfer_mode mode; 	// 20230320 Changes 加上transfer mode： 0: normal mode, 1: slow mode (uninitialized)
+	struct timeval slow_mode_time;		//20230605//20230410 Slow mode count; reset to normal if too many times
 	struct mosquitto__packet in_packet;
 	struct mosquitto__packet *current_out_packet;
 	struct mosquitto__packet *out_packet;
@@ -322,7 +322,7 @@ struct mosquitto
 	pthread_mutex_t state_mutex;
 	pthread_mutex_t mid_mutex;
 	pthread_t thread_id;
-	pthread_mutex_t mode_mutex;	//20230321 Changes transfer_mode的mutex
+	pthread_mutex_t mode_mutex;	//20230321 Changes transfer_mode mutex
 #endif
 	bool clean_start;
 	time_t session_expiry_time;
