@@ -65,7 +65,7 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 		retain = false;
 	}
 
-//Broker傳送PUBLISH給Client
+//Broker sends PUBLISH to Client
 #ifdef WITH_BROKER
 	if(mosq->listener && mosq->listener->mount_point){
 		len = strlen(mosq->listener->mount_point);
@@ -131,7 +131,7 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 					
 					log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, mapped_topic, (long)payloadlen);
 					G_PUB_BYTES_SENT_INC(payloadlen);
-					//Broker傳送PUBLISH給Client
+					//Broker sends PUBLISH to Client
 					rc =  send__real_publish(mosq, mid, mapped_topic, payloadlen, payload, qos, retain, dup, cmsg_props, store_props, expiry_interval);
 					mosquitto__free(mapped_topic);
 					return rc;
@@ -157,7 +157,7 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 	}
 #ifdef WITH_TIMESTAMP
 	struct timeval tp;
-	gettimeofday(&tp, NULL);		//暫時先用gettimeofday(因為同步問題，用clock_gettime的話兩邊時間會不一樣)
+	gettimeofday(&tp, NULL);		//use gettimeofday for now (using clock_gettime will have synchronization error, due to clock difference)
 	// fprintf(stderr, "Bro_send: %ld\n", tp.tv_sec*1000000+tp.tv_usec);
 	char timestamp[30];
 	char cpy_payload[payloadlen];
@@ -168,15 +168,15 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 #endif
 	
 
-	//Broker傳送PUBLISH給Client
-	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, mosq->address, dup, qos, retain, mid, mapped_topic, (long)payloadlen);		//2023加上address
+	//Broker sends PUBLISH to Client
+	log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, mosq->address, dup, qos, retain, mid, mapped_topic, (long)payloadlen);		//2023 add address
 	// log__printf(NULL, MOSQ_LOG_DEBUG, "Sending PUBLISH to %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
 	G_PUB_BYTES_SENT_INC(payloadlen);
 #else
-	//Client傳送PUBLISH給Broker
+	//Client sends PUBLISH to Broker
 	log__printf(mosq, MOSQ_LOG_DEBUG, "Client %s sending PUBLISH (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", mosq->id, dup, qos, retain, mid, topic, (long)payloadlen);
 #endif
-	//Client傳送PUBLISH給Broker
+	//Client sends PUBLISH to Broker
 	return send__real_publish(mosq, mid, topic, payloadlen, payload, qos, retain, dup, cmsg_props, store_props, expiry_interval);
 }
 
@@ -238,8 +238,8 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 	packet->command = (uint8_t)(CMD_PUBLISH | (uint8_t)((dup&0x1)<<3) | (uint8_t)(qos<<1) | retain);
 	packet->remaining_length = packetlen;
 	//20230615
-	packet->pub_or_not=4;				//紀錄這是一個PUBLISH packet
-	packet->payload_length=payloadlen;	//紀錄payload還需要多少長度
+	packet->pub_or_not=4;				//note that this is PUBLISH packet
+	packet->payload_length=payloadlen;	//remaining payload len requirement
 	rc = packet__alloc(packet);
 	if(rc){
 		mosquitto__free(packet);
@@ -267,8 +267,8 @@ int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, 
 		}
 	}
 
-	/* Payload */ //20230615把payload寫進去
-	packet->payload_store=payload;		//20230615 把指針指向存在mosquitto db裡的message payload
+	/* Payload */ //20230615 write payload
+	packet->payload_store=payload;		//20230615 point to message payload in mosquitto db
 	// if(payloadlen){
 	// 	packet__write_bytes(packet, payload, payloadlen);
 	// }
