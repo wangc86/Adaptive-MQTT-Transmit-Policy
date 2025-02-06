@@ -139,8 +139,8 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 		gettimeofday(&now, NULL);
 		log__printf(NULL,MOSQ_LOG_DEBUG,"#latency_threshold_l: %s %ld %d",mosq->id,tmp_lat, mosq->threshold_l);
 		fprintf(stderr, "#latency_threshold_l: %s %ld %ld %d\n",mosq->id,(now.tv_sec*1000000+now.tv_usec),tmp_lat, mosq->threshold_l);
-		#ifdef WITH_A_THRESHOLD	//20230525自動計算thrshold_l
-		//20230525	由broker自動去計算threshold_l (5次的平均)
+		#ifdef WITH_A_THRESHOLD	//20230525 auto compute thrshold_l
+		//20230525	let broker compute threshold_l (average of five samples)
 		mosq->count_for_lat=mosq->count_for_lat%5;
 		long int threshold_l_total=0;
 		mosq->lat_pre[mosq->count_for_lat]=tmp_lat;
@@ -152,7 +152,7 @@ int handle__pubackcomp(struct mosquitto *mosq, const char *type)
 		mosq->count_for_lat++;
 		#endif
 
-		//20230330判斷大於threshold_l的話切換成slow_mode
+		//20230330 if larger than threshold_l, switch to slow_mode
 		if(tmp_lat>=mosq->threshold_l){
 			if(mosquitto__get_mode(mosq)==0)
 				mosq->slow_mode_time.tv_sec=now.tv_sec;
